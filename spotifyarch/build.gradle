@@ -1,0 +1,75 @@
+apply plugin: 'com.android.library'
+
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ "room.schemaLocation" : "$projectDir/schemas".toString()]
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url "https://maven.google.com" }
+        maven { url "https://jitpack.io" }
+        flatDir {
+            dirs "libs"
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.spotify.sdk:spotify-android-auth-1.0.0@aar'
+    compile 'com.spotify.sdk:spotify-player-24-noconnect-2.20b@aar'
+    //noinspection GradleDependency
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    //noinspection GradleDependency
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    implementation 'com.android.support:appcompat-v7:25.3.1'
+    compile('com.googlecode.json-simple:json-simple:1.1.1') {
+        exclude group: 'junit', module: 'junit'
+    }
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
+    compile 'android.arch.lifecycle:runtime:1.0.0-alpha1'
+    compile 'android.arch.lifecycle:extensions:1.0.0-alpha1'
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha1"
+    compile 'android.arch.persistence.room:runtime:1.0.0-alpha1'
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha1"
+    compile 'com.google.dagger:dagger:2.11'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
+    compile 'com.google.dagger:dagger-android:2.11'
+    compile 'com.google.dagger:dagger-android-support:2.11'
+    // if you use the support libraries
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
+    testImplementation 'junit:junit:4.12'
+    compile 'javax.annotation:javax.annotation-api:1.2'
+}
