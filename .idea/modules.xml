@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Musicall.iml" filepath="$PROJECT_DIR$/Musicall.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spotifyarch/spotifyarch.iml" filepath="$PROJECT_DIR$/spotifyarch/spotifyarch.iml" />
     </modules>
   </component>
 </project>

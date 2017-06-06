@@ -2,7 +2,6 @@ package com.timothy.musicall;
 
 import android.arch.lifecycle.LifecycleRegistry;
 import android.arch.lifecycle.LifecycleRegistryOwner;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,22 +12,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import com.google.gson.Gson;
-import com.timothy.musicall.remote.Resource;
-import com.timothy.musicall.services.DefaultViewModel;
-
-import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LifecycleRegistryOwner {
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
-    @Inject
-    DefaultViewModel defaultViewModel;
+    /*@Inject
+    DefaultViewModel defaultViewModel;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +31,13 @@ public class MainActivity extends AppCompatActivity
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
-            AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(Auth.SPOTIFY_CLIENT_ID, AuthenticationResponse.Type.CODE, Auth.REDIRECT_URI);
+          /*  AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(Auth.SPOTIFY_CLIENT_ID, AuthenticationResponse.Type.CODE, Auth.REDIRECT_URI);
             builder.setScopes(new String[]{"playlist-read-private", "playlist-read-collaborative", "playlist-modify-public", "playlist-modify-private", "streaming",
                     "user-follow-modify", "user-follow-read", "user-library-read", "user-library-modify", "user-read-private", "user-read-birthdate",
                     "user-read-email", "user-top-read"});
             AuthenticationRequest request = builder.build();
             AuthenticationClient.openLoginActivity(MainActivity.this, Auth.SPOTIFY_REQUEST_CODE, request);
-        });
+       */ });
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -55,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        ((App)getApplication()).serviceComponent.inject(this);
+        //((App)getApplication()).serviceComponent.inject(this);
     }
 
     @Override
@@ -118,7 +110,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Auth.SPOTIFY_REQUEST_CODE) {
+        /*if (requestCode == Auth.SPOTIFY_REQUEST_CODE) {
             final AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, data);
             if (response.getType().equals(AuthenticationResponse.Type.CODE))
                 defaultViewModel.loadAuthToken(response.getCode()).observe(this, tokenResource -> {
@@ -129,16 +121,16 @@ public class MainActivity extends AppCompatActivity
                         Log.d("TokenError", "Null Token");
                     }
                 });
-        }
+        }*/
     }
 
-    Observer<Resource<SpotifyUser>> meObserver = spotifyUserResource -> {
+    /*Observer<Resource<SpotifyUser>> meObserver = spotifyUserResource -> {
         if (spotifyUserResource != null) {
             Log.d("OnLoadMe", spotifyUserResource.data != null ? spotifyUserResource.data.display_name : "Error with data.");
         } else {
             Log.d("OnLoadMe", "Error loading me.");
         }
-    };
+    };*/
 
     @Override
     public LifecycleRegistry getLifecycle() {
