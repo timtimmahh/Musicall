@@ -1,9 +1,5 @@
 package com.timothy.service_core;
 
-/**
- * Created by logan on 11/30/2016.
- */
-
 public final class Auth {
     //GLOBAL
     public static final String REDIRECT_URI = "musicall://oauth";
