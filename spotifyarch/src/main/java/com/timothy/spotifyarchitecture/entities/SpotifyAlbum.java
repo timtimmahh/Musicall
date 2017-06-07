@@ -1,6 +1,5 @@
 package com.timothy.spotifyarchitecture.entities;
 
-
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Musicall.iml" filepath="$PROJECT_DIR$/../Musicall.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../service-core/service-core.iml" filepath="$PROJECT_DIR$/../service-core/service-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../spotify-android-auth-1.0.0/spotify-android-auth-1.0.0.iml" filepath="$PROJECT_DIR$/../spotify-android-auth-1.0.0/spotify-android-auth-1.0.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../spotify-player-24-noconnect-2.20b/spotify-player-24-noconnect-2.20b.iml" filepath="$PROJECT_DIR$/../spotify-player-24-noconnect-2.20b/spotify-player-24-noconnect-2.20b.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spotifyarch.iml" filepath="$PROJECT_DIR$/spotifyarch.iml" />
+    </modules>
+  </component>
+</project>

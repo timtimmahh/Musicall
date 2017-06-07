@@ -41,16 +41,6 @@ public class SpotifyModule {
     }
 
     @Provides @Singleton
-    ServiceDatabase provideServiceDatabase() {
-        return Room.databaseBuilder(application, ServiceDatabase.class, "services.db").build();
-    }
-
-    @Provides @Singleton
-    SpotifyDao provideServiceDao(ServiceDatabase serviceDatabase) {
-        return serviceDatabase.serviceDao();
-    }
-
-    @Provides @Singleton
     SpotifyRepository provideSpotifyRepository(SpotifyDao serviceDao, SpotifyService spotifyService, SpotifyServiceAuth spotifyServiceAuth, SpotifyCreator.ApiAuthenticator apiAuthenticator) {
         return new SpotifyRepository(serviceDao, spotifyService, spotifyServiceAuth, apiAuthenticator);
     }

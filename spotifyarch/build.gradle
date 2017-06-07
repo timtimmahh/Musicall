@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 'android-O'
+    buildToolsVersion '26.0.0 rc2'
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 25
@@ -28,9 +28,6 @@ android {
         mavenCentral()
         maven { url "https://maven.google.com" }
         maven { url "https://jitpack.io" }
-        flatDir {
-            dirs "libs"
-        }
     }
     dataBinding {
         enabled = true
@@ -47,29 +44,26 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.spotify.sdk:spotify-android-auth-1.0.0@aar'
-    compile 'com.spotify.sdk:spotify-player-24-noconnect-2.20b@aar'
-    //noinspection GradleDependency
-    compile 'com.squareup.retrofit2:retrofit:2.0.2'
-    //noinspection GradleDependency
-    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
-    implementation 'com.android.support:appcompat-v7:25.3.1'
-    compile('com.googlecode.json-simple:json-simple:1.1.1') {
+    testImplementation 'junit:junit:4.12'
+    compile project(':spotify-android-auth-1.0.0')
+    compile project(':spotify-player-24-noconnect-2.20b')
+    compile retrofitDependencies.retrofit
+    compile retrofitDependencies.gsonConverter
+    compile retrofitDependencies.loggingInterceptor
+    implementation supportDependencies.appcompat
+    compile(googlecodeDependencies.jsonSimple) {
         exclude group: 'junit', module: 'junit'
     }
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
-    compile 'android.arch.lifecycle:runtime:1.0.0-alpha1'
-    compile 'android.arch.lifecycle:extensions:1.0.0-alpha1'
-    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha1"
-    compile 'android.arch.persistence.room:runtime:1.0.0-alpha1'
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha1"
-    compile 'com.google.dagger:dagger:2.11'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
-    compile 'com.google.dagger:dagger-android:2.11'
-    compile 'com.google.dagger:dagger-android-support:2.11'
+    compile googlecodeDependencies.gson
+    compile architectureDependencies.lifecycleRuntime
+    compile architectureDependencies.lifecycleExtensions
+    annotationProcessor architectureDependencies.lifecycleCompiler
+    compile architectureDependencies.persistenceRuntime
+    annotationProcessor architectureDependencies.persistenceCompiler
+    compile daggerDependencies.dagger
+    annotationProcessor daggerDependencies.compiler
+    compile daggerDependencies.android
+    compile daggerDependencies.support
     // if you use the support libraries
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
-    testImplementation 'junit:junit:4.12'
-    compile 'javax.annotation:javax.annotation-api:1.2'
+    annotationProcessor daggerDependencies.processor
 }
