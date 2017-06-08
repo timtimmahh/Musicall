@@ -14,16 +14,18 @@ import com.timothy.spotifyarchitecture.retrofit.models.UserPrivate;
 import com.timothy.spotifyarchitecture.room.SpotifyDao;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import retrofit2.Call;
 
 /**
  * Created by tim on 5/30/17.
  */
-
+@Singleton
 public class SpotifyRepository {
 
     private final SpotifyDao serviceDao;
@@ -39,8 +41,8 @@ public class SpotifyRepository {
         this.apiAuthenticator = apiAuthenticator;
     }
 
-    public LiveData<Resource<Token>> getOAuthToken(String authorizationCode) {
-        return new NetworkBoundResource<Token, Token>() {
+    public LiveData<Resource<List<Token>>> getOAuthToken(String authorizationCode) {
+        return new NetworkBoundResource<List<Token>, Token>() {
             @Override
             protected void saveCallResult(@NonNull Token item) {
                 apiAuthenticator.setAccessToken(item.access_token);
@@ -49,7 +51,7 @@ public class SpotifyRepository {
 
             @NonNull
             @Override
-            protected LiveData<Token> loadFromDb() {
+            protected LiveData<List<Token>> loadFromDb() {
                 return serviceDao.loadAuthToken();
             }
 
@@ -68,18 +70,18 @@ public class SpotifyRepository {
     }
 
 
-    public LiveData<Resource<SpotifyUser>> getMe(@NonNull LiveData<Resource<Token>> authToken) {
+    public LiveData<Resource<SpotifyUser>> getMe(@NonNull LiveData<Resource<SpotifyUser>> user) {
         return new NetworkBoundResource<SpotifyUser, UserPrivate>() {
             @Override
             protected void saveCallResult(@NonNull UserPrivate item) {
-                serviceDao.saveMe(SpotifyUser.createSpotifyUser(item, authToken));
+                serviceDao.saveMe(new SpotifyUser(item));
             }
 
             @NonNull
             @Override
             protected LiveData<SpotifyUser> loadFromDb() {
-                return serviceDao.loadMe(authToken.getValue() != null && authToken.getValue().data != null ?
-                        authToken.getValue().data.id : null);
+                return serviceDao.loadMe(user.getValue() != null && user.getValue().data != null ?
+                        user.getValue().data.id : null);
             }
 
             @NonNull

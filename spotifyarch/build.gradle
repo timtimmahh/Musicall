@@ -3,18 +3,13 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 'android-O'
-    buildToolsVersion '26.0.0 rc2'
+    buildToolsVersion "26.0.0-rc2"
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 'O'
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [ "room.schemaLocation" : "$projectDir/schemas".toString()]
-            }
-        }
     }
     buildTypes {
         release {
@@ -29,14 +24,13 @@ android {
         maven { url "https://maven.google.com" }
         maven { url "https://jitpack.io" }
     }
-    dataBinding {
-        enabled = true
-    }
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
 }
 
 dependencies {
@@ -45,8 +39,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testImplementation 'junit:junit:4.12'
-    compile project(':spotify-android-auth-1.0.0')
-    compile project(':spotify-player-24-noconnect-2.20b')
     compile retrofitDependencies.retrofit
     compile retrofitDependencies.gsonConverter
     compile retrofitDependencies.loggingInterceptor
@@ -66,4 +58,6 @@ dependencies {
     compile daggerDependencies.support
     // if you use the support libraries
     annotationProcessor daggerDependencies.processor
+    compile 'com.spotify.sdk:spotify-android-auth-1.0.0@aar'
+    compile 'com.spotify.sdk:spotify-player-24-noconnect-2.20b@aar'
 }

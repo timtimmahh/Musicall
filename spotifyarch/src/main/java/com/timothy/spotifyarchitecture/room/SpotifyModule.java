@@ -2,6 +2,7 @@ package com.timothy.spotifyarchitecture.room;
 
 import android.app.Application;
 import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
 
 import com.timothy.spotifyarchitecture.SpotifyRepository;
 import com.timothy.spotifyarchitecture.retrofit.SpotifyCreator;
@@ -16,33 +17,14 @@ import dagger.Provides;
 /**
  * Created by tim on 5/31/17.
  */
-@Module
-public class SpotifyModule {
+public interface SpotifyModule {
 
-    Application application;
+    SpotifyCreator.ApiAuthenticator provideApiAuthenticator();
 
-    public SpotifyModule(Application application) {
-        this.application = application;
-    }
+    SpotifyService provideSpotifyService(SpotifyCreator.ApiAuthenticator apiAuthenticator);
 
-    @Provides @Singleton
-    SpotifyCreator.ApiAuthenticator provideApiAuthenticator() {
-        return SpotifyCreator.createApiAuthenticator(null);
-    }
+    SpotifyServiceAuth provideSpotifyServiceAuth();
 
-    @Provides @Singleton
-    SpotifyService provideSpotifyService(SpotifyCreator.ApiAuthenticator apiAuthenticator) {
-        return SpotifyCreator.createAuthenticatedService(apiAuthenticator);
-    }
-
-    @Provides @Singleton
-    SpotifyServiceAuth provideSpotifyServiceAuth() {
-        return SpotifyCreator.createServiceAuthenticator();
-    }
-
-    @Provides @Singleton
-    SpotifyRepository provideSpotifyRepository(SpotifyDao serviceDao, SpotifyService spotifyService, SpotifyServiceAuth spotifyServiceAuth, SpotifyCreator.ApiAuthenticator apiAuthenticator) {
-        return new SpotifyRepository(serviceDao, spotifyService, spotifyServiceAuth, apiAuthenticator);
-    }
+    SpotifyRepository provideSpotifyRepository(SpotifyDao spotifyDao, SpotifyService spotifyService, SpotifyServiceAuth spotifyServiceAuth, SpotifyCreator.ApiAuthenticator apiAuthenticator);
 
 }

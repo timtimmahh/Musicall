@@ -1,9 +1,11 @@
 package com.timothy.spotifyarchitecture.entities;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import com.timothy.spotifyarchitecture.remote.Resource;
@@ -15,34 +17,32 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 /**
  * Created by tim on 6/3/17.
  */
-@Entity(tableName = "spotify_users", primaryKeys = {"user_id"},
+@Entity(tableName = "spotify_users", primaryKeys = {"id"},
         foreignKeys = @ForeignKey(entity = Token.class,
-                parentColumns = "id", childColumns = "user_id", onDelete = CASCADE))
+                parentColumns = "access_token", childColumns = "access_token", onDelete = CASCADE))
 public class SpotifyUser extends UserPrivate {
-    @Embedded
-    public Token token;
+    @ColumnInfo(index = true)
+    public String access_token;
 
+    public SpotifyUser() {
 
-    public static SpotifyUser createSpotifyUser(UserPublic userPublic, @NonNull LiveData<Resource<Token>> token) {
-        SpotifyUser user = new SpotifyUser();
-        user.display_name = userPublic.display_name;
-        user.external_urls = userPublic.external_urls;
-        user.followers = userPublic.followers;
-        user.href = userPublic.href;
-        user.id = userPublic.id;
-        user.images = userPublic.images;
-        user.type = userPublic.type;
-        user.uri = userPublic.uri;
+    }
+
+    public SpotifyUser(UserPublic userPublic) {
+        this.display_name = userPublic.display_name;
+        this.external_urls = userPublic.external_urls;
+        this.followers = userPublic.followers;
+        this.href = userPublic.href;
+        this.id = userPublic.id;
+        this.images = userPublic.images;
+        this.type = userPublic.type;
+        this.uri = userPublic.uri;
         if (userPublic instanceof UserPrivate) {
-            user.birthdate = ((UserPrivate)userPublic).birthdate;
-            user.country = ((UserPrivate)userPublic).country;
-            user.email = ((UserPrivate)userPublic).email;
-            user.product = ((UserPrivate)userPublic).product;
+            this.birthdate = ((UserPrivate)userPublic).birthdate;
+            this.country = ((UserPrivate)userPublic).country;
+            this.email = ((UserPrivate)userPublic).email;
+            this.product = ((UserPrivate)userPublic).product;
         }
-        token.getValue().data.id = user.id;
-        user.token = token.getValue().data;
-        user.token.id = user.id;
-        return user;
     }
 
 }

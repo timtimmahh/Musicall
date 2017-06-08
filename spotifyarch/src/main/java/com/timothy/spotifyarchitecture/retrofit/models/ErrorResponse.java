@@ -1,4 +1,4 @@
-package com.timothy.musicall.services.spotify.core.models;
+package com.timothy.spotifyarchitecture.retrofit.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,4 +1,4 @@
-package com.timothy.service_core;
+package com.timothy.musicall;
 
 public final class Auth {
     //GLOBAL

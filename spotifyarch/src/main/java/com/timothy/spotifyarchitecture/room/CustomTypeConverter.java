@@ -4,6 +4,7 @@ import android.arch.persistence.room.TypeConverter;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.timothy.spotifyarchitecture.entities.SpotifyUser;
 import com.timothy.spotifyarchitecture.retrofit.models.Image;
 
 import java.util.List;
@@ -33,4 +34,5 @@ public class CustomTypeConverter {
     public static String imageListToGson(List<Image> images) {
         return new Gson().toJson(images);
     }
+
 }

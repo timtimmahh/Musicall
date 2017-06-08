@@ -11,6 +11,8 @@ import com.timothy.spotifyarchitecture.entities.SpotifyUser;
 import com.timothy.spotifyarchitecture.retrofit.models.Pager;
 import com.timothy.spotifyarchitecture.entities.Token;
 
+import java.util.List;
+
 /**
  * Created by tim on 5/31/17.
  */
@@ -18,15 +20,16 @@ import com.timothy.spotifyarchitecture.entities.Token;
 public interface SpotifyDao {
 
     @Query("SELECT * FROM token")
-    LiveData<Token> loadAuthToken();
+    LiveData<List<Token>> loadAuthToken();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void saveToken(Token token);
 
-    @Query("SELECT * FROM spotify_users WHERE user_id = :userId")
-    LiveData<SpotifyUser> loadMe(String userId);
+    @Query("SELECT * FROM spotify_users WHERE id=:arg0")
+    LiveData<SpotifyUser> loadMe(String id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void saveMe(SpotifyUser spotifyUser);
 
 }
+//BIGSPIN20

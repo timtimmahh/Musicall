@@ -10,6 +10,8 @@ import com.timothy.spotifyarchitecture.entities.SpotifyUser;
 import com.timothy.spotifyarchitecture.entities.Token;
 import com.timothy.spotifyarchitecture.remote.Resource;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 /**
@@ -19,7 +21,7 @@ import javax.inject.Inject;
 public class SpotifyViewModel extends ViewModel {
     private final SpotifyRepository spotifyRepository;
     private MutableLiveData mediator = new MediatorLiveData();
-    private LiveData<Resource<Token>> authToken;
+    private LiveData<Resource<List<Token>>> authToken;
     private LiveData<Resource<SpotifyUser>> me;
 
     @Inject
@@ -27,16 +29,16 @@ public class SpotifyViewModel extends ViewModel {
         this.spotifyRepository = spotifyRepository;
     }
 
-    public LiveData<Resource<Token>> loadAuthToken(String authorizationCode) {
+    public LiveData<Resource<List<Token>>> loadAuthToken(String authorizationCode) {
         return authToken = spotifyRepository.getOAuthToken(authorizationCode);
     }
 
-    public LiveData<Resource<Token>> getAuthToken() {
+    public LiveData<Resource<List<Token>>> getAuthToken() {
         return this.authToken;
     }
 
     public LiveData<Resource<SpotifyUser>> loadMe() {
-        return me = spotifyRepository.getMe(authToken);
+        return me = spotifyRepository.getMe(me);
     }
 
     public LiveData<Resource<SpotifyUser>> getMe() {

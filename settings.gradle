@@ -1,1 +1,1 @@
-include ':spotifyarch', ':service-core', ':spotify-android-auth-1.0.0', ':spotify-player-24-noconnect-2.20b'
+include ':app', ':spotifyarch'
