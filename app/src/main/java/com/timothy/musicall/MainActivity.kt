@@ -2,8 +2,6 @@ package com.timothy.musicall
 
 import android.arch.lifecycle.LifecycleRegistry
 import android.arch.lifecycle.LifecycleRegistryOwner
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -16,24 +14,17 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
-import com.timothy.spotifyarchitecture.SpotifyRepository
-import com.timothy.spotifyarchitecture.entities.Token
-import com.timothy.spotifyarchitecture.remote.Resource
 import com.timothy.spotifyarchitecture.viewmodels.SpotifyViewModel
-
 import javax.inject.Inject
-import kotlin.properties.Delegates
-import kotlin.reflect.KProperty
 
-open class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, LifecycleRegistryOwner {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, LifecycleRegistryOwner {
     private val lifecycleRegistry = LifecycleRegistry(this)
 
     @Inject
-    open lateinit var defaultViewModel: SpotifyViewModel
+    lateinit var defaultViewModel: SpotifyViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
