@@ -1,12 +1,14 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 
 android {
-    compileSdkVersion 'android-O'
-    buildToolsVersion "26.0.0-rc2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 'O'
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -39,25 +41,26 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testImplementation 'junit:junit:4.12'
-    compile retrofitDependencies.retrofit
-    compile retrofitDependencies.gsonConverter
-    compile retrofitDependencies.loggingInterceptor
+    implementation retrofitDependencies.retrofit
+    implementation retrofitDependencies.gsonConverter
+    implementation retrofitDependencies.loggingInterceptor
     implementation supportDependencies.appcompat
-    compile(googlecodeDependencies.jsonSimple) {
+    implementation(googlecodeDependencies.jsonSimple) {
         exclude group: 'junit', module: 'junit'
     }
-    compile googlecodeDependencies.gson
-    compile architectureDependencies.lifecycleRuntime
-    compile architectureDependencies.lifecycleExtensions
-    annotationProcessor architectureDependencies.lifecycleCompiler
-    compile architectureDependencies.persistenceRuntime
-    annotationProcessor architectureDependencies.persistenceCompiler
-    compile daggerDependencies.dagger
-    annotationProcessor daggerDependencies.compiler
-    compile daggerDependencies.android
-    compile daggerDependencies.support
+    implementation googlecodeDependencies.gson
+    implementation architectureDependencies.lifecycleRuntime
+    implementation architectureDependencies.lifecycleExtensions
+    kapt architectureDependencies.lifecycleCompiler
+    implementation architectureDependencies.persistenceRuntime
+    kapt architectureDependencies.persistenceCompiler
+    implementation daggerDependencies.dagger
+    kapt daggerDependencies.compiler
+    implementation daggerDependencies.android
+    implementation daggerDependencies.support
     // if you use the support libraries
-    annotationProcessor daggerDependencies.processor
-    compile 'com.spotify.sdk:spotify-android-auth-1.0.0@aar'
-    compile 'com.spotify.sdk:spotify-player-24-noconnect-2.20b@aar'
+    kapt daggerDependencies.processor
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    implementation project(':spotify-auth')
+    implementation project(':spotify-player')
 }
