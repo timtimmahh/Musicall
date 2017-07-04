@@ -1,0 +1,180 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "df37956e33cf746716a3930b26cab842",
+    "entities": [
+      {
+        "tableName": "token",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `access_token` TEXT, `userId` TEXT, `token_type` TEXT, `scope` TEXT, `expires_in` INTEGER, `refresh_token` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "access_token",
+            "columnName": "access_token",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "token_type",
+            "columnName": "token_type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "scope",
+            "columnName": "scope",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "expires_in",
+            "columnName": "expires_in",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "refresh_token",
+            "columnName": "refresh_token",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_token_access_token_userId",
+            "unique": true,
+            "columnNames": [
+              "access_token",
+              "userId"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_token_access_token_userId` ON `${TABLE_NAME}` (`access_token`, `userId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "spotify_users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`access_token` TEXT, `birthdate` TEXT, `country` TEXT, `email` TEXT, `product` TEXT, `display_name` TEXT, `external_urls` TEXT, `href` TEXT, `id` TEXT, `images` TEXT, `type` TEXT, `uri` TEXT, `followerhref` TEXT, `followertotal` INTEGER, PRIMARY KEY(`id`), FOREIGN KEY(`access_token`, `id`) REFERENCES `token`(`access_token`, `userId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "access_token",
+            "columnName": "access_token",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "birthdate",
+            "columnName": "birthdate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "country",
+            "columnName": "country",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "product",
+            "columnName": "product",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "display_name",
+            "columnName": "display_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "external_urls",
+            "columnName": "external_urls",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "href",
+            "columnName": "href",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "images",
+            "columnName": "images",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "uri",
+            "columnName": "uri",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "followers.href",
+            "columnName": "followerhref",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "followers.total",
+            "columnName": "followertotal",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_spotify_users_access_token_id",
+            "unique": true,
+            "columnNames": [
+              "access_token",
+              "id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_spotify_users_access_token_id` ON `${TABLE_NAME}` (`access_token`, `id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "token",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "access_token",
+              "id"
+            ],
+            "referencedColumns": [
+              "access_token",
+              "userId"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"df37956e33cf746716a3930b26cab842\")"
+    ]
+  }
+}
