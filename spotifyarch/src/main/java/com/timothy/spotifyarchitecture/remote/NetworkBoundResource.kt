@@ -16,39 +16,44 @@
 package com.timothy.spotifyarchitecture.remote
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MediatorLiveData
 import android.os.AsyncTask
 import android.support.annotation.MainThread
 import android.support.annotation.WorkerThread
-import android.util.Log
-
-import com.timothy.spotifyarchitecture.livedata.ResourceLiveData
+import com.timothy.spotifyarchitecture.log
 import com.timothy.spotifyarchitecture.retrofit.SpotifyCallback
 import com.timothy.spotifyarchitecture.retrofit.SpotifyError
-
 import retrofit2.Call
 import retrofit2.Response
 
-abstract class NetworkBoundResource<out ResultLiveData : ResourceLiveData<ResultType>, ResultType, RequestType> @MainThread
-protected constructor(val asLiveData: ResultLiveData) {
+abstract class NetworkBoundResource<ResultType, RequestType> {
+    val asLiveData: MediatorLiveData<Resource<ResultType>> = MediatorLiveData<Resource<ResultType>>()
 
     init {
-        asLiveData.value = Resource.loading<ResultType>(null)
-        @Suppress("LeakingThis")
+        init()
+    }
+
+    fun init() {
+        asLiveData.value = Resource.loading(null)
         val dbSource = loadFromDb()
         asLiveData.addSource(dbSource) { data ->
+            log("Checking to fetch from network...")
             asLiveData.removeSource(dbSource)
             if (shouldFetch(data)) {
                 fetchFromNetwork(dbSource)
             } else {
+                log("Not fetching data")
                 asLiveData.addSource(dbSource) { newData ->
-                    asLiveData.setValue(Resource.success(newData!!))
+                    asLiveData.value = Resource.success(newData!!)
                 }
             }
         }
+        log("End of init")
     }
 
-    private fun fetchFromNetwork(dbSource: LiveData<ResultType>) {
-        asLiveData.addSource(dbSource) { newData -> asLiveData.setValue(Resource.loading(newData)) }
+    private fun fetchFromNetwork(dbSource: LiveData<ResultType>?) {
+        log("Attempting to fetch from network", "NetworkBoundResource")
+        asLiveData.addSource(dbSource) { newData -> asLiveData.value = Resource.loading(newData) }
         createCall().enqueue(object : SpotifyCallback<RequestType>() {
             override fun onResponse(call: Call<RequestType>, response: Response<RequestType>, payload: RequestType) {
                 asLiveData.removeSource(dbSource)
@@ -56,9 +61,9 @@ protected constructor(val asLiveData: ResultLiveData) {
             }
 
             override fun onFailure(call: Call<RequestType>, error: SpotifyError) {
-                onFetchFailed()
+                onFetchFailed(call, error)
                 asLiveData.removeSource(dbSource)
-                asLiveData.addSource(dbSource) { newData -> asLiveData.setValue(Resource.error<ResultType>(error.message!!, newData)) }
+                asLiveData.addSource(dbSource) { newData -> asLiveData.value = Resource.error(error.message!!, newData) }
             }
         })
     }
@@ -83,11 +88,9 @@ protected constructor(val asLiveData: ResultLiveData) {
     protected abstract fun createCall(): Call<RequestType>
 
     @MainThread
-    private fun onFetchFailed() {
-        Log.d(javaClass.simpleName, "Failed to fetch " + asLiveData.javaClass.getSimpleName())
-    }
+    protected abstract fun onFetchFailed(call: Call<RequestType>, error: Throwable)
 
-    private class SaveAsync<ResultLiveData : ResourceLiveData<ResultType>, ResultType, RequestType> internal constructor(internal var resource: NetworkBoundResource<ResultLiveData, ResultType, RequestType>, internal var response: RequestType) : AsyncTask<Void, Void, Void>() {
+    private class SaveAsync<ResultType, RequestType> internal constructor(internal var resource: NetworkBoundResource<ResultType, RequestType>, internal var response: RequestType) : AsyncTask<Void, Void, Void>() {
 
         override fun doInBackground(vararg voids: Void): Void? {
             resource.saveCallResult(response)

@@ -11,12 +11,12 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
+import com.timothy.spotifyarchitecture.log
 import com.timothy.spotifyarchitecture.viewmodels.SpotifyViewModel
 import javax.inject.Inject
 
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener { view ->
             val builder = AuthenticationRequest.Builder(Auth.SPOTIFY_CLIENT_ID, AuthenticationResponse.Type.CODE, Auth.REDIRECT_URI)
-            builder.setScopes(arrayOf("playlist-read-private", "playlist-read-collaborative", "playlist-modify-public", "playlist-modify-private", "streaming", "user-follow-modify", "user-follow-read", "user-library-read", "user-library-modify", "user-read-private", "user-read-birthdate", "user-read-email", "user-top-read"))
+                    .setScopes(arrayOf("playlist-read-private", "playlist-read-collaborative", "playlist-modify-public", "playlist-modify-private", "streaming", "user-follow-modify", "user-follow-read", "user-library-read", "user-library-modify", "user-read-private", "user-read-birthdate", "user-read-email", "user-top-read"))
             val request = builder.build()
             AuthenticationClient.openLoginActivity(this@MainActivity, Auth.SPOTIFY_REQUEST_CODE, request)
         }
@@ -109,8 +109,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (requestCode == Auth.SPOTIFY_REQUEST_CODE) {
             val response = AuthenticationClient.getResponse(resultCode, data)
             if (response.type == AuthenticationResponse.Type.CODE) {
-                Log.d("MainActivity", "Code:" + response.code)
+                log("Code:" + response.code)
                 defaultViewModel.loadAuthToken(code = response.code)
+            } else {
+                log("error obtaining code")
             }
         }
     }

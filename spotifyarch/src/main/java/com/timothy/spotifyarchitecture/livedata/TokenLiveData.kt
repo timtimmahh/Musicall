@@ -1,26 +1,24 @@
 package com.timothy.spotifyarchitecture.livedata
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
-import android.content.Context
-import android.support.annotation.MainThread
-
+import android.arch.lifecycle.MediatorLiveData
 import com.timothy.spotifyarchitecture.entities.Token
-import com.timothy.spotifyarchitecture.remote.NetworkBoundResource
-import com.timothy.spotifyarchitecture.remote.Resource
-
-import retrofit2.Call
+import com.timothy.spotifyarchitecture.notNullEmpty
 
 /**
- * Created by tim on 6/4/17.
+ * LiveData implementation to create a MediatorLiveData<Token>
  */
 
-class TokenLiveData : ResourceLiveData<Token>() {
+class TokenLiveData private constructor() : MediatorLiveData<Token>() {
 
-    fun needsRefresh(): Boolean {
-        return data()?.refresh_token?.isNotEmpty()!!
-                && System.currentTimeMillis() >= data()?.expires_in!!
+    companion object {
+        @JvmField
+        var tInstance: TokenLiveData = TokenLiveData()
+
+        @JvmStatic
+        fun needsRefresh(): Boolean {
+            return notNullEmpty(tInstance.value?.refresh_token)
+                    && System.currentTimeMillis() >= tInstance.value!!.expires_in
+        }
     }
 
 }

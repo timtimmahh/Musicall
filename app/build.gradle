@@ -69,6 +69,6 @@ dependencies {
     // if you use the support libraries
     kapt daggerDependencies.processor
     implementation project(':spotifyarch')
-    implementation project(':spotify-auth')
+    implementation 'com.spotify.android:auth:1.0.0-alpha'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 }

@@ -1,30 +1,16 @@
 package com.timothy.spotifyarchitecture.livedata
 
-import android.arch.lifecycle.Observer
-
+import android.arch.lifecycle.MediatorLiveData
 import com.timothy.spotifyarchitecture.entities.SpotifyUser
-import com.timothy.spotifyarchitecture.entities.Token
-import com.timothy.spotifyarchitecture.remote.Resource
-import com.timothy.spotifyarchitecture.remote.Status
 
 /**
- * Created by tim on 6/8/17.
+ * LiveData implementation to create a MediatorLiveData<SpotifyUser>
  */
 
-class SpotifyUserLiveData private constructor() : ResourceLiveData<SpotifyUser>() {
-    val userToken: TokenLiveData
-
-    init {
-        userToken = TokenLiveData()
-    }
+class SpotifyUserLiveData private constructor() : MediatorLiveData<SpotifyUser>() {
 
     companion object {
-        private var uInstance: SpotifyUserLiveData? = null
-
-        fun get(): SpotifyUserLiveData {
-            if (uInstance == null)
-                uInstance = SpotifyUserLiveData()
-            return uInstance as SpotifyUserLiveData
-        }
+        @JvmField
+        var uInstance: SpotifyUserLiveData = SpotifyUserLiveData()
     }
 }
