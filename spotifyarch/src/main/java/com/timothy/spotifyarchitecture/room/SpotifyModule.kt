@@ -1,24 +1,19 @@
 package com.timothy.spotifyarchitecture.room
 
-import android.app.Application
-import android.arch.persistence.room.Room
-import android.arch.persistence.room.RoomDatabase
-
 import com.timothy.spotifyarchitecture.SpotifyRepository
 import com.timothy.spotifyarchitecture.retrofit.SpotifyCreator
 import com.timothy.spotifyarchitecture.retrofit.SpotifyService
 import com.timothy.spotifyarchitecture.retrofit.SpotifyServiceAuth
 
-import javax.inject.Singleton
-
-import dagger.Module
-import dagger.Provides
-
 /**
- * Created by tim on 5/31/17.
+ * Dagger module interface to provide necessary objects upon startup.
  */
 interface SpotifyModule {
-
+    
+    fun provideSpotifyDatabase(): SpotifyDatabase
+    
+    fun provideSpotifyDao(spotifyDatabase: SpotifyDatabase): SpotifyDao
+    
     fun provideApiAuthenticator(): SpotifyCreator.ApiAuthenticator
 
     fun provideSpotifyService(apiAuthenticator: SpotifyCreator.ApiAuthenticator): SpotifyService

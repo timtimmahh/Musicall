@@ -15,6 +15,7 @@
  */
 package com.timothy.spotifyarchitecture.remote
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.os.AsyncTask
@@ -23,6 +24,9 @@ import android.support.annotation.WorkerThread
 import com.timothy.spotifyarchitecture.log
 import com.timothy.spotifyarchitecture.retrofit.SpotifyCallback
 import com.timothy.spotifyarchitecture.retrofit.SpotifyError
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Response
 
@@ -50,8 +54,8 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
         }
         log("End of init")
     }
-
-    private fun fetchFromNetwork(dbSource: LiveData<ResultType>?) {
+	
+	fun fetchFromNetwork(dbSource: LiveData<ResultType>?) {
         log("Attempting to fetch from network", "NetworkBoundResource")
         asLiveData.addSource(dbSource) { newData -> asLiveData.value = Resource.loading(newData) }
         createCall().enqueue(object : SpotifyCallback<RequestType>() {
@@ -67,28 +71,39 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
             }
         })
     }
-
-    @MainThread
-    private fun saveResultAndReInit(response: RequestType) {
-        SaveAsync(this, response).execute()
-    }
+	
+	@SuppressLint("WrongThread")
+	@MainThread
+	private fun saveResultAndReInit(response: RequestType) {
+		Observable.just(saveCallResult(response))
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe {
+					asLiveData.addSource(loadFromDb()) { newData ->
+						asLiveData.value = Resource.success(newData)
+					}
+				}
+	}
 
     @WorkerThread
-    protected abstract fun saveCallResult(item: RequestType)
+    abstract fun saveCallResult(item: RequestType)
+	
+	@WorkerThread
+	abstract fun updateResult(item: ResultType)
 
     @MainThread
-    protected open fun shouldFetch(data: ResultType?): Boolean {
+    open fun shouldFetch(data: ResultType?): Boolean {
         return data == null
     }
 
     @MainThread
-    protected abstract fun loadFromDb(): LiveData<ResultType>
+    abstract fun loadFromDb(): LiveData<ResultType>
 
     @MainThread
-    protected abstract fun createCall(): Call<RequestType>
+    abstract fun createCall(): Call<RequestType>
 
     @MainThread
-    protected abstract fun onFetchFailed(call: Call<RequestType>, error: Throwable)
+    abstract fun onFetchFailed(call: Call<RequestType>, error: Throwable)
 
     private class SaveAsync<ResultType, RequestType> internal constructor(internal var resource: NetworkBoundResource<ResultType, RequestType>, internal var response: RequestType) : AsyncTask<Void, Void, Void>() {
 

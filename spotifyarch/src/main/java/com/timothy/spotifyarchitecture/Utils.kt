@@ -1,5 +1,6 @@
 package com.timothy.spotifyarchitecture
 
+import android.content.pm.PackageManager
 import android.util.Log
 import com.google.gson.Gson
 import kotlin.reflect.KClass
@@ -10,8 +11,6 @@ fun toString(value: Any?): String {
     return gson.toJson(value)
 }
 
-fun <E> arrNullEmpty(value: Collection<E>?): Boolean = isNull(value) || value!!.isEmpty()
-fun <E> arrNotNullEmpty(value: Collection<E>?): Boolean = notNull(value) && value!!.isNotEmpty()
 fun empty(value: CharSequence): Boolean = value.isEmpty()
 fun notEmpty(value: CharSequence): Boolean = value.isNotEmpty()
 fun notNullEmpty(value: CharSequence?): Boolean = !value.isNullOrEmpty()
@@ -21,6 +20,15 @@ fun getFirstNotNull(vararg values: Any?): Any {
     if (notNull(values) && values.isNotEmpty()) for (v in values) {
         if (notNull(v)) return v!!
     }; return 0
+}
+
+fun isAppInstalled(pkg: String = "", manager: PackageManager): Boolean {
+	try {
+		manager.getPackageInfo(pkg, 0)
+		return true
+	} catch (e: PackageManager.NameNotFoundException) {
+		return false
+	}
 }
 
 fun getFirstNotNullEmpty(vararg values: CharSequence?): CharSequence {

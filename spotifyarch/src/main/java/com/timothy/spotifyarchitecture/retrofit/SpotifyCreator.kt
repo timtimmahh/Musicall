@@ -1,17 +1,15 @@
 package com.timothy.spotifyarchitecture.retrofit
 
-import java.io.IOException
-
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 
 /**
- * Created by tim on 5/28/17.
+ * A utility class to create retrofit services to access the Spotify Web API
  */
 
 class SpotifyCreator : Spotify() {
@@ -49,13 +47,13 @@ class SpotifyCreator : Spotify() {
 
         fun createHttpClient(authenticator: ApiAuthenticator): OkHttpClient {
             val interceptor = HttpLoggingInterceptor()
-            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            interceptor.level = HttpLoggingInterceptor.Level.BASIC
             return okhttp3.OkHttpClient.Builder().addInterceptor(interceptor).addInterceptor(authenticator).build()
         }
 
         fun createNoAuthHttpClient(): OkHttpClient {
             val interceptor = HttpLoggingInterceptor()
-            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            interceptor.level = HttpLoggingInterceptor.Level.BASIC
             return okhttp3.OkHttpClient.Builder().addInterceptor(interceptor).build()
         }
 

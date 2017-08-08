@@ -11,8 +11,8 @@ abstract class SpotifyCallback<T> : Callback<T> {
     abstract fun onFailure(call: Call<T>, error: SpotifyError)
 
     override fun onResponse(call: Call<T>, response: Response<T>) {
-        if (response.isSuccessful) {
-            onResponse(call, response, response.body())
+	    if (response.isSuccessful && response.body() != null) {
+		    onResponse(call, response, response.body() !!)
         } else {
             onFailure(call, SpotifyError.fromResponse(response))
         }

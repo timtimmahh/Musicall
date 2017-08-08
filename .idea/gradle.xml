@@ -7,11 +7,10 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/spotify-auth" />
-            <option value="$PROJECT_DIR$/spotify-player" />
-            <option value="$PROJECT_DIR$/spotifyarch" />
+            <option value="/media/tim/Programming/Projects/Musicall" />
+            <option value="/media/tim/Programming/Projects/Musicall/app" />
+            <option value="/media/tim/Programming/Projects/Musicall/spotify-player" />
+            <option value="/media/tim/Programming/Projects/Musicall/spotifyarch" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

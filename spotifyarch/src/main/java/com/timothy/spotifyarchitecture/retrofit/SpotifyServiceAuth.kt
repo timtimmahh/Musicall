@@ -8,14 +8,14 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
 /**
- * Created by tim on 4/14/17.
+ * Retrofit service to authenticate and retrieve OAuth token's from Spotify
  */
 
 interface SpotifyServiceAuth {
 
     @POST("api/token")
     @FormUrlEncoded
-    fun getToken(@FieldMap body: Map<String, Any>): Call<Token>
+    fun getToken(@FieldMap body: Map<String, String>): Call<Token>
 
     companion object {
         val SPOTIFY_AUTH_API_ENDPOINT = "https://accounts.spotify.com/"

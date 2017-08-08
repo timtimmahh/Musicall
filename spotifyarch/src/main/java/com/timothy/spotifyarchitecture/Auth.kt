@@ -1,7 +1,7 @@
 package com.timothy.spotifyarchitecture
 
 /**
- * Created by logan on 11/30/2016.
+ * Put auth credentials here before anything will work
  */
 
 object Auth {

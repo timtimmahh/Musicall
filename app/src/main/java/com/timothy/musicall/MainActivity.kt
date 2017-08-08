@@ -2,6 +2,7 @@ package com.timothy.musicall
 
 import android.arch.lifecycle.LifecycleRegistry
 import android.arch.lifecycle.LifecycleRegistryOwner
+import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -13,10 +14,8 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
-import com.spotify.sdk.android.authentication.AuthenticationClient
-import com.spotify.sdk.android.authentication.AuthenticationRequest
-import com.spotify.sdk.android.authentication.AuthenticationResponse
 import com.timothy.spotifyarchitecture.log
+import com.timothy.spotifyarchitecture.toString
 import com.timothy.spotifyarchitecture.viewmodels.SpotifyViewModel
 import javax.inject.Inject
 
@@ -32,13 +31,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         (application as App).serviceComponent.inject(this)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
         val fab = findViewById<FloatingActionButton>(R.id.fab)
-        fab.setOnClickListener { view ->
-            val builder = AuthenticationRequest.Builder(Auth.SPOTIFY_CLIENT_ID, AuthenticationResponse.Type.CODE, Auth.REDIRECT_URI)
-                    .setScopes(arrayOf("playlist-read-private", "playlist-read-collaborative", "playlist-modify-public", "playlist-modify-private", "streaming", "user-follow-modify", "user-follow-read", "user-library-read", "user-library-modify", "user-read-private", "user-read-birthdate", "user-read-email", "user-top-read"))
-            val request = builder.build()
-            AuthenticationClient.openLoginActivity(this@MainActivity, Auth.SPOTIFY_REQUEST_CODE, request)
+	    fab.setOnClickListener {
+		    //defaultViewModel.loadMyAlbums()
         }
 
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
@@ -49,7 +44,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
-
+	    defaultViewModel.loadAuthLogin(this)
     }
 
     override fun onBackPressed() {
@@ -106,18 +101,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == Auth.SPOTIFY_REQUEST_CODE) {
-            val response = AuthenticationClient.getResponse(resultCode, data)
-            if (response.type == AuthenticationResponse.Type.CODE) {
-                log("Code:" + response.code)
-                defaultViewModel.loadAuthToken(code = response.code)
-            } else {
-                log("error obtaining code")
-            }
-        }
+	    if (requestCode == Auth.SPOTIFY_REQUEST_CODE)
+		    defaultViewModel.authLoginResponse(resultCode, data, this).observe(this, Observer {
+			    log("Observing token response: ${toString(it)}")
+		    })
     }
-
-    override fun getLifecycle(): LifecycleRegistry {
+	
+	/**
+	 * Handle onNewIntent() to inform the fragment manager that the
+	 * state is not saved.  If you are handling new intents and may be
+	 * making changes to the fragment state, you want to be sure to call
+	 * through to the super-class here first.  Otherwise, if your state
+	 * is saved but the activity is not stopped, you could get an
+	 * onNewIntent() call which happens before onResume() and trying to
+	 * perform fragment operations at that point will throw IllegalStateException
+	 * because the fragment manager thinks the state is still saved.
+	 */
+	override fun onNewIntent(intent: Intent?) {
+		super.onNewIntent(intent)
+		log(com.timothy.spotifyarchitecture.toString(intent))
+		/*if (requestCode == Auth.SPOTIFY_REQUEST_CODE)
+			defaultViewModel.authLoginResponse(resultCode, data, this).observe(this, Observer {
+				log("Observing token response: ${toString(it)}")
+			})*/
+		
+	}
+	
+	override fun getLifecycle(): LifecycleRegistry {
         return lifecycleRegistry
     }
 }

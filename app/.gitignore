@@ -1,2 +1,9 @@
-/build
-/src/main/java/com/timothy/musicall/Auth.java
+local.properties
+libs
+src/main/java/com/timothy/musicall/Auth.kt
+.idea
+gradle
+gradlew.bat
+build
+app.iml
+schemas

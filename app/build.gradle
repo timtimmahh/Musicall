@@ -1,10 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.timothy.musicall"
         minSdkVersion 15
@@ -24,18 +23,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    repositories {
-        jcenter()
-        mavenCentral()
-        maven { url "https://maven.google.com" }
-        maven { url "https://jitpack.io" }
+    sourceSets {
+        main.java.srcDirs += 'src/main/java'
+        main.kotlin.srcDirs += 'src/main/java'
     }
+}
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+kapt {
+    generateStubs = true
 }
 
 dependencies {
@@ -44,31 +39,41 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testImplementation 'junit:junit:4.12'
-    implementation supportDependencies.appcompat
-    implementation supportDependencies.design
-    implementation supportDependencies.constraintLayout
-    implementation supportDependencies.cardview
-    implementation supportDependencies.customtabs
-    implementation glide
-    implementation retrofitDependencies.retrofit
-    implementation retrofitDependencies.gsonConverter
-    implementation retrofitDependencies.loggingInterceptor
-    implementation(googlecodeDependencies.jsonSimple) {
+    implementation "com.android.support:appcompat-v7:$supportLibrary"
+    implementation "com.android.support:design:$supportLibrary"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "com.android.support:cardview-v7:$supportLibrary"
+    implementation "com.android.support:customtabs:$supportLibrary"
+    implementation 'com.github.bumptech.glide:glide:4.0.0'
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.8.1'
+    implementation('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude group: 'junit', module: 'junit'
     }
-    implementation googlecodeDependencies.gson
-    implementation architectureDependencies.lifecycleRuntime
-    implementation architectureDependencies.lifecycleExtensions
-    kapt architectureDependencies.lifecycleCompiler
-    implementation architectureDependencies.persistenceRuntime
-    kapt architectureDependencies.persistenceCompiler
-    implementation daggerDependencies.dagger
-    kapt daggerDependencies.compiler
-    implementation daggerDependencies.android
-    implementation daggerDependencies.support
-    // if you use the support libraries
-    kapt daggerDependencies.processor
+    implementation 'com.google.code.gson:gson:2.8.1'
+    implementation "android.arch.lifecycle:runtime:$architectureVersion"
+    implementation "android.arch.lifecycle:extensions:$architectureVersion"
+
+    //annotationProcessor "android.arch.lifecycle:compiler:$architectureVersion"
+    kapt "android.arch.lifecycle:compiler:$architectureVersion"
+    implementation "android.arch.persistence.room:runtime:$architectureVersion"
+
+    //annotationProcessor "android.arch.persistence.room:compiler:$architectureVersion"
+    kapt "android.arch.persistence.room:compiler:$architectureVersion"
+    implementation "com.google.dagger:dagger:$daggerVersion"
+
+    //annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"apply plugin: 'kotlin-kapt'
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+    implementation "com.google.dagger:dagger-android:$daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+
+    //annotationProcessor "com.google.dagger:dagger-android-processor:$daggerVersion"
+    kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
     implementation project(':spotifyarch')
-    implementation 'com.spotify.android:auth:1.0.0-alpha'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.1.0'
+    implementation 'com.facebook.stetho:stetho:1.5.0'
+    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
 }

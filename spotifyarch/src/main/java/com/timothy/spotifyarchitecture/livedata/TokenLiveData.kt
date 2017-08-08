@@ -16,8 +16,8 @@ class TokenLiveData private constructor() : MediatorLiveData<Token>() {
 
         @JvmStatic
         fun needsRefresh(): Boolean {
-            return notNullEmpty(tInstance.value?.refresh_token)
-                    && System.currentTimeMillis() >= tInstance.value!!.expires_in
+	        return notNullEmpty(tInstance.value?.refreshToken)
+			        && System.currentTimeMillis() >= tInstance.value !!.expiresIn
         }
     }
 

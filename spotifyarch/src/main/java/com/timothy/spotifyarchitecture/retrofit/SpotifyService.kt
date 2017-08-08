@@ -1,16 +1,8 @@
 package com.timothy.spotifyarchitecture.retrofit
 
 import com.timothy.spotifyarchitecture.retrofit.models.*
-
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
-import retrofit2.http.Query
-import retrofit2.http.QueryMap
+import retrofit2.http.*
 
 interface SpotifyService {
 
@@ -54,7 +46,7 @@ interface SpotifyService {
      * @return List of user's playlists wrapped in a `Pager` object
      */
     @GET("me/playlists")
-    fun getMyPlaylists(@QueryMap options: Map<String, Any>): Call<Pager<PlaylistSimple>>
+    fun getMyPlaylists(@QueryMap options: Map<String, String>): Call<Pager<PlaylistSimple>>
 
     /**
      * Get a list of the playlists owned or followed by a Spotify user.
@@ -69,7 +61,7 @@ interface SpotifyService {
      * @see [Get a List of a User’s Playlists](https://developer.spotify.com/web-api/get-list-users-playlists/)
      */
     @GET("users/{id}/playlists")
-    fun getPlaylists(@Path("id") userId: String, @QueryMap options: Map<String, Any>): Call<Pager<PlaylistSimple>>
+    fun getPlaylists(@Path("id") userId: String, @QueryMap options: Map<String, String>): Call<Pager<PlaylistSimple>>
 
     /**
      * Get a list of the playlists owned or followed by a Spotify user.
@@ -98,7 +90,7 @@ interface SpotifyService {
      * @see [Get a Playlist](https://developer.spotify.com/web-api/get-playlist/)
      */
     @GET("users/{user_id}/playlists/{playlist_id}")
-    fun getPlaylist(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @QueryMap options: Map<String, Any>): Call<Playlist>
+    fun getPlaylist(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @QueryMap options: Map<String, String>): Call<Playlist>
 
     /**
      * Get a playlist owned by a Spotify user.
@@ -129,7 +121,7 @@ interface SpotifyService {
      * @see [Get a Playlist’s Tracks](https://developer.spotify.com/web-api/get-playlists-tracks/)
      */
     @GET("users/{user_id}/playlists/{playlist_id}/tracks")
-    fun getPlaylistTracks(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @QueryMap options: Map<String, Any>): Call<Pager<PlaylistTrack>>
+    fun getPlaylistTracks(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @QueryMap options: Map<String, String>): Call<Pager<PlaylistTrack>>
 
     /**
      * Get full details of the tracks of a playlist owned by a Spotify user.
@@ -157,7 +149,7 @@ interface SpotifyService {
      * @see [Create a Playlist](https://developer.spotify.com/web-api/create-playlist/)
      */
     @POST("users/{user_id}/playlists")
-    fun createPlaylist(@Path("user_id") userId: String, @Body options: Map<String, Any>): Playlist
+    fun createPlaylist(@Path("user_id") userId: String, @Body options: Map<String, String>): Playlist
 
     /**
      * Add tracks to a playlist
@@ -175,7 +167,7 @@ interface SpotifyService {
      * @see [Add Tracks to a Playlist](https://developer.spotify.com/web-api/add-tracks-to-playlist/)
      */
     @POST("users/{user_id}/playlists/{playlist_id}/tracks")
-    fun addTracksToPlaylist(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @QueryMap queryParameters: Map<String, Any>, @Body body: Map<String, Any>): Call<SnapshotId>
+    fun addTracksToPlaylist(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @QueryMap queryParameters: Map<String, String>, @Body body: Map<String, String>): Call<SnapshotId>
 
     /**
      * Remove one or more tracks from a user’s playlist.
@@ -240,7 +232,7 @@ interface SpotifyService {
      * @see [Change a Playlist's Details](https://developer.spotify.com/web-api/change-playlist-details/)
      */
     @PUT("users/{user_id}/playlists/{playlist_id}")
-    fun changePlaylistDetails(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @Body body: Map<String, Any>): Call<Result>
+    fun changePlaylistDetails(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @Body body: Map<String, String>): Call<Result>
 
     /**
      * Add the current user as a follower of a playlist.
@@ -300,7 +292,7 @@ interface SpotifyService {
      * @see [Reorder a Playlist](https://developer.spotify.com/web-api/reorder-playlists-tracks/)
      */
     @PUT("users/{user_id}/playlists/{playlist_id}/tracks")
-    fun reorderPlaylistTracks(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @Body body: Map<String, Any>): Call<SnapshotId>
+    fun reorderPlaylistTracks(@Path("user_id") userId: String, @Path("playlist_id") playlistId: String, @Body body: Map<String, String>): Call<SnapshotId>
 
 
     /**********
@@ -332,7 +324,7 @@ interface SpotifyService {
      * @see [Get an Album](https://developer.spotify.com/web-api/get-album/)
      */
     @GET("albums/{id}")
-    fun getAlbum(@Path("id") albumId: String, @QueryMap options: Map<String, Any>): Call<Album>
+    fun getAlbum(@Path("id") albumId: String, @QueryMap options: Map<String, String>): Call<Album>
 
     /**
      * Get Spotify catalog information for multiple albums identified by their Spotify IDs.
@@ -359,7 +351,7 @@ interface SpotifyService {
      * @see [Get Several Albums](https://developer.spotify.com/web-api/get-several-albums/)
      */
     @GET("albums")
-    fun getAlbums(@Query("ids") albumIds: String, @QueryMap options: Map<String, Any>): Call<Albums>
+    fun getAlbums(@Query("ids") albumIds: String, @QueryMap options: Map<String, String>): Call<Albums>
 
     /**
      * Get Spotify catalog information about an album’s tracks.
@@ -386,7 +378,7 @@ interface SpotifyService {
      * @see [Get an Album’s Tracks](https://developer.spotify.com/web-api/get-albums-tracks/)
      */
     @GET("albums/{id}/tracks")
-    fun getAlbumTracks(@Path("id") albumId: String, @QueryMap options: Map<String, Any>): Call<Pager<Track>>
+    fun getAlbumTracks(@Path("id") albumId: String, @QueryMap options: Map<String, String>): Call<Pager<Track>>
 
 
     /***********
@@ -442,7 +434,7 @@ interface SpotifyService {
      * @see [Get an Artist's Albums](https://developer.spotify.com/web-api/get-artists-albums/)
      */
     @GET("artists/{id}/albums")
-    fun getArtistAlbums(@Path("id") artistId: String, @QueryMap options: Map<String, Any>): Call<Pager<Album>>
+    fun getArtistAlbums(@Path("id") artistId: String, @QueryMap options: Map<String, String>): Call<Pager<Album>>
 
     /**
      * Get Spotify catalog information about an artist’s top tracks by country.
@@ -500,7 +492,7 @@ interface SpotifyService {
      * @see [Get a Track](https://developer.spotify.com/web-api/get-track/)
      */
     @GET("tracks/{id}")
-    fun getTrack(@Path("id") trackId: String, @QueryMap options: Map<String, Any>): Call<Track>
+    fun getTrack(@Path("id") trackId: String, @QueryMap options: Map<String, String>): Call<Track>
 
     /**
      * Get Several Tracks
@@ -527,7 +519,7 @@ interface SpotifyService {
      * @see [Get Several Tracks](https://developer.spotify.com/web-api/get-several-tracks/)
      */
     @GET("tracks")
-    fun getTracks(@Query("ids") trackIds: String, @QueryMap options: Map<String, Any>): Call<Tracks>
+    fun getTracks(@Query("ids") trackIds: String, @QueryMap options: Map<String, String>): Call<Tracks>
 
 
     /**********
@@ -555,7 +547,7 @@ interface SpotifyService {
      * @see [Get a List of Featured Playlists](https://developer.spotify.com/web-api/get-list-featured-playlists/)
      */
     @GET("browse/featured-playlists")
-    fun getFeaturedPlaylists(@QueryMap options: Map<String, Any>): Call<FeaturedPlaylists>
+    fun getFeaturedPlaylists(@QueryMap options: Map<String, String>): Call<FeaturedPlaylists>
 
     /**
      * Get a list of new album releases featured in Spotify (shown, for example, on a Spotify player’s “Browse” tab).
@@ -578,7 +570,7 @@ interface SpotifyService {
      * @see [Get a List of New Releases](https://developer.spotify.com/web-api/get-list-new-releases/)
      */
     @GET("browse/new-releases")
-    fun getNewReleases(@QueryMap options: Map<String, Any>): Call<NewReleases>
+    fun getNewReleases(@QueryMap options: Map<String, String>): Call<NewReleases>
 
     /**
      * Retrieve Spotify categories. Categories used to tag items in
@@ -591,7 +583,7 @@ interface SpotifyService {
      * @see [Get a List of Categories](https://developer.spotify.com/web-api/get-list-categories/)
      */
     @GET("browse/categories")
-    fun getCategories(@QueryMap options: Map<String, Any>): Call<CategoriesPager>
+    fun getCategories(@QueryMap options: Map<String, String>): Call<CategoriesPager>
 
     /**
      * Retrieve a Spotify category.
@@ -605,7 +597,7 @@ interface SpotifyService {
      * @see [Get a Spotify Category](https://developer.spotify.com/web-api/get-category/)
      */
     @GET("browse/categories/{category_id}")
-    fun getCategory(@Path("category_id") categoryId: String, @QueryMap options: Map<String, Any>): Call<Category>
+    fun getCategory(@Path("category_id") categoryId: String, @QueryMap options: Map<String, String>): Call<Category>
 
     /**
      * Retrieve playlists for a Spotify Category.
@@ -619,7 +611,7 @@ interface SpotifyService {
      * @see [Get playlists for a Spotify Category](https://developer.spotify.com/web-api/get-categorys-playlists/)
      */
     @GET("browse/categories/{category_id}/playlists")
-    fun getPlaylistsForCategory(@Path("category_id") categoryId: String, @QueryMap options: Map<String, Any>): Call<PlaylistsPager>
+    fun getPlaylistsForCategory(@Path("category_id") categoryId: String, @QueryMap options: Map<String, String>): Call<PlaylistsPager>
 
 
     /************************
@@ -647,7 +639,7 @@ interface SpotifyService {
      * @see [Get a User’s Saved Tracks](https://developer.spotify.com/web-api/get-users-saved-tracks/)
      */
     @GET("me/tracks")
-    fun getMySavedTracks(@QueryMap options: Map<String, Any>): Call<Pager<SavedTrack>>
+    fun getMySavedTracks(@QueryMap options: Map<String, String>): Call<Pager<SavedTrack>>
 
     /**
      * Check if one or more tracks is already saved in the current Spotify user’s “Your Music” library.
@@ -706,7 +698,7 @@ interface SpotifyService {
      * @see [Get a User’s Saved Albums](https://developer.spotify.com/web-api/get-users-saved-albums/)
      */
     @GET("me/albums")
-    fun getMySavedAlbums(@QueryMap options: Map<String, Any>): Call<Pager<SavedAlbum>>
+    fun getMySavedAlbums(@QueryMap options: Map<String, String>): Call<Pager<SavedAlbum>>
 
     /**
      * Check if one or more albums is already saved in the current Spotify user’s “Your Music” library.
@@ -858,7 +850,7 @@ interface SpotifyService {
      * @see [Get User's Followed Artists](https://developer.spotify.com/web-api/get-followed-artists/)
      */
     @GET("me/following?type=artist")
-    fun getFollowedArtists(@QueryMap options: Map<String, Any>): Call<ArtistsCursorPager>
+    fun getFollowedArtists(@QueryMap options: Map<String, String>): Call<ArtistsCursorPager>
 
     /**********
      * Search *
@@ -889,7 +881,7 @@ interface SpotifyService {
      * @see [Search for an Item](https://developer.spotify.com/web-api/search-item/)
      */
     @GET("search?type=track")
-    fun searchTracks(@Query("q") q: String, @QueryMap options: Map<String, Any>): Call<TracksPager>
+    fun searchTracks(@Query("q") q: String, @QueryMap options: Map<String, String>): Call<TracksPager>
 
     /**
      * Get Spotify catalog information about artists that match a keyword string.
@@ -916,7 +908,7 @@ interface SpotifyService {
      * @see [Search for an Item](https://developer.spotify.com/web-api/search-item/)
      */
     @GET("search?type=artist")
-    fun searchArtists(@Query("q") q: String, @QueryMap options: Map<String, Any>): Call<ArtistsPager>
+    fun searchArtists(@Query("q") q: String, @QueryMap options: Map<String, String>): Call<ArtistsPager>
 
     /**
      * Get Spotify catalog information about albums that match a keyword string.
@@ -943,7 +935,7 @@ interface SpotifyService {
      * @see [Search for an Item](https://developer.spotify.com/web-api/search-item/)
      */
     @GET("search?type=album")
-    fun searchAlbums(@Query("q") q: String, @QueryMap options: Map<String, Any>): Call<AlbumsPager>
+    fun searchAlbums(@Query("q") q: String, @QueryMap options: Map<String, String>): Call<AlbumsPager>
 
     /**
      * Get Spotify catalog information about playlists that match a keyword string.
@@ -970,7 +962,7 @@ interface SpotifyService {
      * @see [Search for an Item](https://developer.spotify.com/web-api/search-item/)
      */
     @GET("search?type=playlist")
-    fun searchPlaylists(@Query("q") q: String, @QueryMap options: Map<String, Any>): Call<PlaylistsPager>
+    fun searchPlaylists(@Query("q") q: String, @QueryMap options: Map<String, String>): Call<PlaylistsPager>
 
     /******************
      * Audio features *
@@ -1010,7 +1002,7 @@ interface SpotifyService {
      * @return Recommendations response object
      */
     @GET("/recommendations")
-    fun getRecommendations(@QueryMap options: Map<String, Any>): Call<Recommendations>
+    fun getRecommendations(@QueryMap options: Map<String, String>): Call<Recommendations>
 
 
     /**
@@ -1045,7 +1037,7 @@ interface SpotifyService {
      * * The object in turn contains a paging object of Artists or Tracks
      */
     @GET("/me/top/artists")
-    fun getTopArtists(@QueryMap options: Map<String, Any>): Call<Pager<Artist>>
+    fun getTopArtists(@QueryMap options: Map<String, String>): Call<Pager<Artist>>
 
     /**
      * Get the current user’s top tracks based on calculated affinity.
@@ -1066,5 +1058,5 @@ interface SpotifyService {
      * * The object in turn contains a paging object of Artists or Tracks
      */
     @GET("/me/top/tracks")
-    fun getTopTracks(@QueryMap options: Map<String, Any>): Call<Pager<Track>>
+    fun getTopTracks(@QueryMap options: Map<String, String>): Call<Pager<Track>>
 }
