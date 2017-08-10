@@ -1,2 +1,3 @@
 build
 app.iml
+src/main/java/com/timothy/musicall/Auth.kt
