@@ -1,1 +1,1 @@
-include ':app', ':spotifyarch', ':spotify-player'
+include ':app', ':spotify-web', ':spotify-player', ':soundcloud'

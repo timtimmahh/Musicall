@@ -4,8 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Musicall.iml" filepath="$PROJECT_DIR$/Musicall.iml" />
       <module fileurl="file:///media/tim/Programming/Projects/Musicall/app/app.iml" filepath="/media/tim/Programming/Projects/Musicall/app/app.iml" />
+      <module fileurl="file:///media/tim/Programming/Projects/Musicall/soundcloud/soundcloud.iml" filepath="/media/tim/Programming/Projects/Musicall/soundcloud/soundcloud.iml" />
       <module fileurl="file:///media/tim/Programming/Projects/Musicall/spotify-player/spotify-player.iml" filepath="/media/tim/Programming/Projects/Musicall/spotify-player/spotify-player.iml" />
-      <module fileurl="file:///media/tim/Programming/Projects/Musicall/spotifyarch/spotifyarch.iml" filepath="/media/tim/Programming/Projects/Musicall/spotifyarch/spotifyarch.iml" />
+      <module fileurl="file:///media/tim/Programming/Projects/Musicall/spotify-web/spotifyarch.iml" filepath="/media/tim/Programming/Projects/Musicall/spotify-web/spotifyarch.iml" />
     </modules>
   </component>
 </project>
