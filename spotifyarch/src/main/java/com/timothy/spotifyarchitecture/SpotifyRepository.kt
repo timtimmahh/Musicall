@@ -5,10 +5,10 @@ import android.arch.lifecycle.MutableLiveData
 import android.support.annotation.WorkerThread
 import android.util.Log
 import com.timothy.spotifyarchitecture.entities.SpotifyUser
-import com.timothy.spotifyarchitecture.entities.Token
 import com.timothy.spotifyarchitecture.livedata.TokenLiveData
 import com.timothy.spotifyarchitecture.remote.Resource
 import com.timothy.spotifyarchitecture.retrofit.*
+import com.timothy.spotifyarchitecture.retrofit.models.Token
 import com.timothy.spotifyarchitecture.retrofit.models.UserPrivate
 import com.timothy.spotifyarchitecture.room.SpotifyDao
 import io.reactivex.Observable
@@ -30,19 +30,19 @@ class SpotifyRepository
 @Inject
 constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var spotifyServiceAuth: SpotifyServiceAuth, var apiAuthenticator: SpotifyCreator.ApiAuthenticator) {
 	
-	fun updateApiAuthenticator(accessToken: String? = "") {
-		if (notNullEmpty(accessToken))
-			apiAuthenticator.accessToken = accessToken !!
+	fun updateApiAuthenticator(accessToken: Token? = Token()) {
+		if (notNullEmpty(accessToken?.access_token))
+			apiAuthenticator.accessToken = accessToken?.access_token !!
 	}
 	
-	fun obtainTokenResource(id: String = "", accessToken: String = "", code: String = "", onCompletion: (MediatorLiveData<Resource<Token>>) -> Unit = {}): AutoResourceObtainer<Token, Token> {
+	fun obtainTokenResource(id: String = "", accessToken: Token = Token(), code: String = "", onCompletion: (MediatorLiveData<Resource<Token>>) -> Unit = {}): AutoResourceObtainer<Token, Token> {
 		return object : AutoResourceObtainer<Token, Token>(onCompletion) {
 			override fun loadResource(value: Token?): Token? {
-				val userId = value?.userId ?: id
-				val authToken = value?.accessToken ?: accessToken
+				val userId = value?.user_id ?: id
+				val authToken = value ?: accessToken
 				val token: Token? =
-						if (notNullEmpty(userId) || notEmpty(authToken))
-							serviceDao.loadAuthToken(userId, authToken)
+						if (notNullEmpty(userId) || notEmpty(authToken.access_token))
+							serviceDao.loadAuthToken(userId, authToken.access_token)
 						else null
 				updateApiAuthenticator(authToken)
 				log("loadFromDb: ${toString(token)}")
@@ -57,7 +57,7 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 				val body = HashMap<String, String>()
 				if (TokenLiveData.needsRefresh() && empty(code)) {
 					body.put("grant_type", "refresh_token")
-					body.put("refresh_token", TokenLiveData.tInstance.value?.refreshToken !!)
+					body.put("refresh_token", TokenLiveData.tInstance.value?.refresh_token !!)
 				} else if (notEmpty(code)) {
 					body.put("grant_type", "authorization_code")
 					body.put("code", code)
@@ -78,24 +78,24 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 			
 			override fun saveResource(item: Token) {
 				if (isNull(item)) return
-				item.expiresIn = System.currentTimeMillis() + item.expiresIn * 1000
-				updateApiAuthenticator(item.accessToken)
-				serviceDao.saveToken(item)
+				item.expires_in = System.currentTimeMillis() + item.expires_in * 1000
+				updateApiAuthenticator(item)
+				TokenLiveData.tInstance.postValue(item)
 			}
 			
 			override fun updateResource(item: Token) {
 				if (notNull(item))
-					serviceDao.updateToken(item)
+					TokenLiveData.tInstance.postValue(item)
 			}
 		}
 	}
 	
 	/*private val tokenResource: MediatorLiveData<Resource<Token>> = MediatorLiveData()
-	fun getToken(id: String = "", accessToken: String = "", code: String = ""): MediatorLiveData<Resource<Token>> {
+	fun getToken(id: String = "", access_token: String = "", code: String = ""): MediatorLiveData<Resource<Token>> {
 		log("getting token...")
 		val tokenData: MutableLiveData<Token> = MutableLiveData()
 		tokenResource.value = Resource.loading(null)
-		tokenData.value = loadToken(id, accessToken)
+		tokenData.value = loadToken(id, access_token)
 		if (nullEmpty(tokenData.value?.access_token)) tokenData.value = null
 		log("loaded token from db...")
 		tokenResource.addSource(tokenData) { dbToken ->
@@ -115,14 +115,14 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 		return tokenResource
 	}*/
 	
-	fun obtainMeResource(id: String = "", accessToken: String = "", onCompletion: (MediatorLiveData<Resource<SpotifyUser>>) -> Unit = {}): AutoResourceObtainer<SpotifyUser, UserPrivate> {
+	fun obtainMeResource(id: String = "", accessToken: Token, onCompletion: (MediatorLiveData<Resource<SpotifyUser>>) -> Unit = {}): AutoResourceObtainer<SpotifyUser, UserPrivate> {
 		return object : AutoResourceObtainer<SpotifyUser, UserPrivate>(onCompletion) {
 			override fun loadResource(value: SpotifyUser?): SpotifyUser? {
 				val userId = value?.id ?: id
-				val authToken = value?.accessToken ?: accessToken
+				val authToken = value?.token?.access_token ?: accessToken.access_token
 				val user: SpotifyUser? =
 						if (notEmpty(userId) || notEmpty(authToken))
-							serviceDao.loadMe(userId, accessToken)
+							serviceDao.loadMe(userId, authToken)
 						else null
 				log("loadFromDb:" + toString(user))
 				return user
@@ -182,7 +182,7 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 			override fun saveResource(item: List<SpotifyUserAlbums>) {
 				if (notNull(item)) {
 					serviceDao.insertAlbums(item)
-					serviceDao.insertAllUserAlbums(item.map { SpotifyUserAlbums(0, it.userId, it.albumId) })
+					serviceDao.insertAllUserAlbums(item.map { SpotifyUserAlbums(0, it.user_id, it.albumId) })
 				}
 			}
 
@@ -195,7 +195,8 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 	
 }
 
-abstract class AutoResourceObtainer<ResultType : Any, RequestType>(val onCompletion: (MediatorLiveData<Resource<ResultType>>) -> Unit) {
+abstract class AutoResourceObtainer<ResultType : Any, RequestType>(val onCompletion:
+                                                                   (MediatorLiveData<Resource<ResultType>>) -> Unit) {
 	protected val resource: MediatorLiveData<Resource<ResultType>> = MediatorLiveData()
 	val logLevel: Int = Log.DEBUG
 	

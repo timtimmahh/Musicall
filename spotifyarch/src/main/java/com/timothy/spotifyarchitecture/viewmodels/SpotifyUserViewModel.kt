@@ -9,16 +9,16 @@ import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
 import com.timothy.spotifyarchitecture.*
-import com.timothy.spotifyarchitecture.entities.Token
 import com.timothy.spotifyarchitecture.livedata.SpotifyUserLiveData
 import com.timothy.spotifyarchitecture.livedata.TokenLiveData
 import com.timothy.spotifyarchitecture.remote.Status
+import com.timothy.spotifyarchitecture.retrofit.models.Token
 import javax.inject.Inject
 
 /**
  * ViewModel implementation to create a Spotify view instance
  */
-class SpotifyViewModel
+class SpotifyUserViewModel
 @Inject
 constructor(application: Application, private var spotifyRepository: SpotifyRepository) : AndroidViewModel(application) {
 
@@ -33,27 +33,28 @@ constructor(application: Application, private var spotifyRepository: SpotifyRepo
 	
 	    authToken.addSource(spotifyUser) {
             if (isNull(authToken.value) || isNull(it)) return@addSource
-		    if (it !!.id != authToken.value !!.userId) {
-			    authToken.value !!.userId = it.id
+		    if (it !!.id != authToken.value !!.user_id) {
+			    authToken.value !!.user_id = it.id
 			    spotifyRepository.obtainTokenResource().updateResultResource(authToken.value !!)
 		    }
-		    if (it.accessToken != authToken.value !!.accessToken) {
-			    it.accessToken = authToken.value !!.accessToken
-			    spotifyRepository.obtainMeResource().updateResultResource(it)
+		    if (it.token.access_token != authToken.value !!.access_token) {
+			    it.token.access_token = authToken.value !!.access_token
+			    spotifyRepository.obtainMeResource(accessToken = authToken.value !!).updateResultResource(it)
 		    }
         }
         spotifyUser.addSource(authToken) {
 	        it?.let {
 		        if (isNull(spotifyUser.value)) {
-			        loadMe(it.userId, it.accessToken); return@addSource
+			        loadMe(it.user_id, it); return@addSource
 		        }
-		        if (it.userId != spotifyUser.value !!.id) {
-			        it.userId = spotifyUser.value !!.id
+		        if (it.user_id != spotifyUser.value !!.id) {
+			        it.user_id = spotifyUser.value !!.id
 			        spotifyRepository.obtainTokenResource().updateResultResource(it)
 		        }
-		        if (it.accessToken != spotifyUser.value !!.accessToken) {
-			        spotifyUser.value !!.accessToken = it.accessToken
-			        spotifyRepository.obtainMeResource().updateResultResource(spotifyUser.value !!)
+		        if (it.access_token != spotifyUser.value !!.token.access_token) {
+			        spotifyUser.value !!.token.access_token = it.access_token
+			        spotifyRepository.obtainMeResource(accessToken = Token())
+					        .updateResultResource(spotifyUser.value !!)
 		        }
 	        }
         }
@@ -81,8 +82,8 @@ constructor(application: Application, private var spotifyRepository: SpotifyRepo
 			}
 			AuthenticationResponse.Type.TOKEN -> {
 				log("Token: ${response.accessToken}")
-				spotifyRepository.obtainTokenResource().saveResource(Token(accessToken = response.accessToken, scope = arrayOf("playlist-read-private", "playlist-read-collaborative", "playlist-modify-public", "playlist-modify-private", "streaming", "user-follow-modify", "user-follow-read", "user-library-read", "user-library-modify", "user-read-private", "user-read-birthdate", "user-read-email", "user-top-read").toString(),
-				                                                           expiresIn = response.expiresIn.toLong(), id = 0))
+				spotifyRepository.obtainTokenResource().saveResource(Token(access_token = response.accessToken, scope = arrayOf("playlist-read-private", "playlist-read-collaborative", "playlist-modify-public", "playlist-modify-private", "streaming", "user-follow-modify", "user-follow-read", "user-library-read", "user-library-modify", "user-read-private", "user-read-birthdate", "user-read-email", "user-top-read").toString(),
+						expires_in = response.expiresIn.toLong()))
 			}
 			AuthenticationResponse.Type.EMPTY -> {
 				log("LoginActivity stopped before completing")
@@ -97,14 +98,14 @@ constructor(application: Application, private var spotifyRepository: SpotifyRepo
 		}
 		return authToken
 	}
-
-    fun loadAuthToken(id: String = "", accessToken: String = "", code: String = ""): TokenLiveData {
+	
+	fun loadAuthToken(id: String = "", accessToken: Token = authToken.value ?: Token(), code: String = ""): TokenLiveData {
         log("loadingToken...")
 	    val tokenResourceObj = spotifyRepository.obtainTokenResource(id, accessToken, code) { authToken.removeSource(it) }
 	    authToken.addSource(tokenResourceObj.obtainResource()) { tokenResource ->
             log(toString(tokenResource), "loadAuthTokenObserver")
             when (tokenResource?.status) {
-	            Status.SUCCESS, Status.LOADING -> if (notNullEmpty(tokenResource.data?.accessToken) && tokenResource.data != authToken.value) authToken.value = tokenResource.data else log("Resource: ${tokenResource.status} has null data", "loadAuthTokenObserver")
+	            Status.SUCCESS, Status.LOADING -> if (notNullEmpty(tokenResource.data?.access_token) && tokenResource.data != authToken.value) authToken.value = tokenResource.data else log("Resource: ${tokenResource.status} has null data", "loadAuthTokenObserver")
                 Status.ERROR -> log("Error loading resource: ${tokenResource.message}")
                 else -> log("Resource is null")
             }
@@ -112,8 +113,9 @@ constructor(application: Application, private var spotifyRepository: SpotifyRepo
 	    log("tokenResource added as authToken source")
         return authToken
     }
-
-    fun loadMe(userId: String = "", accessToken: String = ""): SpotifyUserLiveData {
+	
+	fun loadMe(userId: String = "", accessToken: Token = authToken.value ?: Token()):
+			SpotifyUserLiveData {
 	    log("loading user...")
 	    spotifyUser.addSource(spotifyRepository.obtainMeResource(userId, accessToken) { spotifyUser.removeSource(it) }.obtainResource()) { userResource ->
 		    log(toString(userResource), "loadMeObserver")

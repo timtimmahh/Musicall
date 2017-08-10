@@ -3,7 +3,11 @@
 package com.timothy.spotifyarchitecture.room
 
 import android.arch.persistence.room.*
-import com.timothy.spotifyarchitecture.entities.*
+import com.timothy.spotifyarchitecture.entities.SpotifyAlbum
+import com.timothy.spotifyarchitecture.entities.SpotifyArtist
+import com.timothy.spotifyarchitecture.entities.SpotifyTrack
+import com.timothy.spotifyarchitecture.entities.SpotifyUser
+import com.timothy.spotifyarchitecture.retrofit.models.Token
 
 /**
  * Dao for Room Database
@@ -11,15 +15,8 @@ import com.timothy.spotifyarchitecture.entities.*
 @Dao
 interface SpotifyDao {
 	//Token dao methods
-	@Query("SELECT * FROM token WHERE id=:arg0 OR user_id=:arg0 OR access_token=:arg1")
+	@Query("SELECT access_token,user_id,token_type,scope,expires_in,refresh_token FROM spotify_users WHERE id=:arg0 OR user_id=:arg0 OR access_token=:arg1")
 	fun loadAuthToken(id: String, authToken: String): Token
-	
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	fun saveToken(token: Token)
-	
-	@Update(onConflict = OnConflictStrategy.REPLACE)
-	fun updateToken(token: Token)
-	
 	
 	//User dao methods
 	@Query("SELECT * FROM spotify_users WHERE id=:arg0 OR access_token=:arg1")
@@ -32,8 +29,8 @@ interface SpotifyDao {
 	fun updateMe(spotifyUser: SpotifyUser)
 
 
-//    @Query("SELECT * FROM spotify_user_albums INNER JOIN spotify_albums ON userId=:arg0 AND spotify_user_albums.albumId=spotify_albums.id")
-//    fun loadMySavedAlbums(userId: String): List<SpotifyUserAlbums>
+//    @Query("SELECT * FROM spotify_user_albums INNER JOIN spotify_albums ON user_id=:arg0 AND spotify_user_albums.albumId=spotify_albums.id")
+//    fun loadMySavedAlbums(user_id: String): List<SpotifyUserAlbums>
 	
 	
 	//Album dao methods

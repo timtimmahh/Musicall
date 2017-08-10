@@ -1,16 +1,16 @@
 package com.timothy.spotifyarchitecture.entities
 
-import android.arch.persistence.room.*
-
-import android.arch.persistence.room.ForeignKey.CASCADE
+import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.Embedded
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 import com.timothy.spotifyarchitecture.retrofit.models.*
 
 /**
  * Room Entity class represents a table in an SQL database
  */
-@Entity(tableName = "spotify_users", indices = arrayOf(Index(value = "access_token", unique = true)), foreignKeys = arrayOf(ForeignKey(entity = Token::class,
-                                                                                                                                       parentColumns = arrayOf("access_token"), childColumns = arrayOf("access_token"), onDelete = CASCADE)))
-data class SpotifyUser(@ColumnInfo(name = "access_token") var accessToken: String = "",
+@Entity(tableName = "spotify_users")
+data class SpotifyUser(@Embedded var token: Token = Token(),
                        var birthdate: String = "",
                        var country: String = "",
                        var email: String = "",
@@ -26,27 +26,8 @@ data class SpotifyUser(@ColumnInfo(name = "access_token") var accessToken: Strin
                        var images: List<Image> = listOf(),
                        var type: String = "",
                        var uri: String = "") {
-	constructor(accessToken: String, userPrivate: UserPrivate) : this(accessToken, userPrivate.birthdate, userPrivate.country, userPrivate.email, userPrivate.product, userPrivate.display_name ?: "", userPrivate.external_urls, userPrivate.followers, userPrivate.href, userPrivate.id, userPrivate.images, userPrivate.type, userPrivate.uri)
-	constructor() : this("", "", "", "", "", "", mapOf(), Followers(), "", "", listOf(), "", "")
-}
-
-/**
- * Room Entity class represents a table in an SQL database
- */
-@Entity(tableName = "token", indices = arrayOf(Index(value = "access_token", unique = true)))
-data class Token(@PrimaryKey(autoGenerate = true) var id: Long = 0,
-                 @ColumnInfo(name = "access_token")
-                 var accessToken: String = "",
-                 @ColumnInfo(name = "user_id")
-                 var userId: String = "",
-                 @ColumnInfo(name = "token_type")
-                 var tokenType: String = "Bearer",
-                 var scope: String = "",
-                 @ColumnInfo(name = "expires_in")
-                 var expiresIn: Long = 0,
-                 @ColumnInfo(name = "refresh_token")
-                 var refreshToken: String = "") {
-	constructor() : this(0, "", "", "Bearer", "", 0, "")
+	constructor(token: Token, userPrivate: UserPrivate) : this(token, userPrivate.birthdate, userPrivate.country, userPrivate.email, userPrivate.product, userPrivate.display_name ?: "", userPrivate.external_urls, userPrivate.followers, userPrivate.href, userPrivate.id, userPrivate.images, userPrivate.type, userPrivate.uri)
+	constructor() : this(Token(), "", "", "", "", "", mapOf(), Followers(), "", "", listOf(), "", "")
 }
 
 /**

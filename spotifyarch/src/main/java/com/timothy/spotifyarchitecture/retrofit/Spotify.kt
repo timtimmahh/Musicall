@@ -1,21 +1,17 @@
 package com.timothy.spotifyarchitecture.retrofit
 
-import com.timothy.spotifyarchitecture.retrofit.Config
-
-import java.io.IOException
-
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 
 /**
  * Creates and configures a REST adapter for Spotify Web API.
 
  * Basic usage:
- * SpotifyService spotifyService = Spotify.createAuthenticatedService(accessToken);
+ * SpotifyService spotifyService = Spotify.createAuthenticatedService(access_token);
 
  * Access token is optional for certain endpoints
  * so if you know you'll only use the ones that don't require authorisation

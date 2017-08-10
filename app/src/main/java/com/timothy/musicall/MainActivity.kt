@@ -4,6 +4,7 @@ import android.arch.lifecycle.LifecycleRegistry
 import android.arch.lifecycle.LifecycleRegistryOwner
 import android.arch.lifecycle.Observer
 import android.content.Intent
+import android.databinding.BindingAdapter
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
@@ -14,16 +15,30 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.module.AppGlideModule
 import com.timothy.spotifyarchitecture.log
+import com.timothy.spotifyarchitecture.retrofit.models.Image
 import com.timothy.spotifyarchitecture.toString
-import com.timothy.spotifyarchitecture.viewmodels.SpotifyViewModel
+import com.timothy.spotifyarchitecture.viewmodels.SpotifyUserViewModel
 import javax.inject.Inject
+
+@BindingAdapter("app:imageUrls")
+fun loadImage(view: ImageView, imageUrls: List<Image>) {
+	GlideApp.with(view).load(imageUrls.get(imageUrls.size - 1).url).diskCacheStrategy(DiskCacheStrategy.ALL).centerCrop().fallback(R.mipmap
+			.ic_launcher_round).placeholder(R.mipmap.ic_launcher_round).into(view)
+}
+
+@GlideModule
+class MainGlideModule : AppGlideModule()
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, LifecycleRegistryOwner {
     private val lifecycleRegistry = LifecycleRegistry(this)
 
     @Inject
-    lateinit var defaultViewModel: SpotifyViewModel
+    lateinit var defaultUserViewModel: SpotifyUserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +48,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
         val fab = findViewById<FloatingActionButton>(R.id.fab)
 	    fab.setOnClickListener {
-		    //defaultViewModel.loadMyAlbums()
+		    //defaultUserViewModel.loadMyAlbums()
         }
 
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
@@ -44,10 +59,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
-	    defaultViewModel.loadAuthLogin(this)
+	    defaultUserViewModel.loadAuthLogin(this)
     }
-
-    override fun onBackPressed() {
+	
+	override fun onBackPressed() {
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START)
@@ -102,7 +117,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
 	    if (requestCode == Auth.SPOTIFY_REQUEST_CODE)
-		    defaultViewModel.authLoginResponse(resultCode, data, this).observe(this, Observer {
+		    defaultUserViewModel.authLoginResponse(resultCode, data, this).observe(this, Observer {
 			    log("Observing token response: ${toString(it)}")
 		    })
     }
@@ -121,7 +136,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 		super.onNewIntent(intent)
 		log(com.timothy.spotifyarchitecture.toString(intent))
 		/*if (requestCode == Auth.SPOTIFY_REQUEST_CODE)
-			defaultViewModel.authLoginResponse(resultCode, data, this).observe(this, Observer {
+			defaultUserViewModel.authLoginResponse(resultCode, data, this).observe(this, Observer {
 				log("Observing token response: ${toString(it)}")
 			})*/
 		
