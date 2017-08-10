@@ -4,5 +4,3 @@ spotifyarch.iml
 .gradle
 gradle
 .idea
-libs
-gradlew.bat
