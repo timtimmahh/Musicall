@@ -1,6 +1,2 @@
 build
-src/main/java/com/timothy/spotifyarchitecture/Auth.kt
 spotifyarch.iml
-.gradle
-gradle
-.idea
