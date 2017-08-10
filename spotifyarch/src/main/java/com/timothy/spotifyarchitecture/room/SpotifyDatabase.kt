@@ -11,8 +11,6 @@ import com.timothy.spotifyarchitecture.retrofit.models.Image
  */
 interface SpotifyDatabase {
     fun spotifyDao(): SpotifyDao
-	
-	
 }
 
 class SpotifyConverters {

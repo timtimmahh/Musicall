@@ -1,7 +1,7 @@
 package com.timothy.spotifyarchitecture.retrofit
 
-import com.timothy.spotifyarchitecture.entities.Token
 
+import com.timothy.spotifyarchitecture.retrofit.models.Token
 import retrofit2.Call
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded

@@ -65,15 +65,12 @@ class ServiceModule(var application: Application) : SpotifyModule {
     @Provides
     @Singleton
     fun provideServiceDatabase(): ServiceDatabase {
-	    return Room.databaseBuilder(application, ServiceDatabase::class.java, "services.db")
-			    .addMigrations(Migrators.MIGRATOR_1_2, Migrators.MIGRATOR_2_3, Migrators
-					    .MIGRATOR_3_4).build()
+	    return Room.databaseBuilder(application, ServiceDatabase::class.java, "services.db").fallbackToDestructiveMigration()
+			    .build()
     }
 }
 
 private class Migrators {
-	val migrations = listOf<Migration>(MIGRATOR_1_2, MIGRATOR_2_3, MIGRATOR_3_4)
-	
 	object MIGRATOR_1_2 : Migration(1, 2) {
 		override fun migrate(database: SupportSQLiteDatabase?) {
 			//TODO for future database changes

@@ -1,8 +1,8 @@
 package com.timothy.spotifyarchitecture.livedata
 
 import android.arch.lifecycle.MediatorLiveData
-import com.timothy.spotifyarchitecture.entities.Token
 import com.timothy.spotifyarchitecture.notNullEmpty
+import com.timothy.spotifyarchitecture.retrofit.models.Token
 
 /**
  * LiveData implementation to create a MediatorLiveData<Token>
@@ -16,8 +16,8 @@ class TokenLiveData private constructor() : MediatorLiveData<Token>() {
 
         @JvmStatic
         fun needsRefresh(): Boolean {
-	        return notNullEmpty(tInstance.value?.refreshToken)
-			        && System.currentTimeMillis() >= tInstance.value !!.expiresIn
+	        return notNullEmpty(tInstance.value?.refresh_token)
+			        && System.currentTimeMillis() >= tInstance.value !!.expires_in
         }
     }
 
