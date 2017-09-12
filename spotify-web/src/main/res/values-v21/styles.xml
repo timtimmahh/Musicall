@@ -1,0 +1,39 @@
+<resources>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/spotifyGreen</item>
+        <item name="colorPrimaryDark">@color/spotifyBlack</item>
+        <item name="colorAccent">@color/spotifyGreen</item>
+        <item name="android:colorBackground">@color/spotifyWhite</item>
+        <item name="android:colorForeground">@color/spotifyBlack</item>
+        <item name="android:textColorPrimary">@color/spotifyBlack</item>
+        <item name="android:textColorPrimaryInverse">@color/spotifyBlack</item>
+        <item name="android:textColorSecondary">@color/spotifyBlack</item>
+        <item name="android:textColorSecondaryInverse">@color/spotifyBlack</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:statusBarColor">?android:attr/colorPrimary</item>
+    </style>
+
+    <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/spotifyGreen</item>
+        <item name="colorPrimaryDark">@color/spotifyWhite</item>
+        <item name="android:colorAccent">@color/spotifyGreen</item>
+        <item name="android:colorBackground">@color/spotifyBlack</item>
+        <item name="android:colorForeground">@color/spotifyWhite</item>
+        <item name="android:textColorPrimary">@color/spotifyWhite</item>
+        <item name="android:textColorPrimaryInverse">@color/spotifyWhite</item>
+        <item name="android:textColorSecondary">@color/spotifyWhite</item>
+        <item name="android:textColorSecondaryInverse">@color/spotifyWhite</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="android:navigationBarColor">@color/spotifyBlack</item>
+        <item name="android:statusBarColor">?android:attr/colorPrimary</item>
+    </style>
+</resources>

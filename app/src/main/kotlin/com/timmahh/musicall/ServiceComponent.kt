@@ -1,5 +1,6 @@
 package com.timmahh.musicall
 
+import com.timmahh.spotifyweb.presenters.SpotifyDrawerLayout
 import dagger.Component
 import javax.inject.Singleton
 
@@ -10,4 +11,5 @@ import javax.inject.Singleton
 @Component(modules = arrayOf(ServiceModule::class))
 interface ServiceComponent {
     fun inject(mainActivity: MainActivity)
+    fun inject(spotifyDrawerLayout: SpotifyDrawerLayout)
 }

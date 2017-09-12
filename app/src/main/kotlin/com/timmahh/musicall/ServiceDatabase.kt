@@ -15,7 +15,7 @@ import com.timmahh.spotifyweb.room.SpotifyDatabase
  * Room database class
  */
 @Database(entities = arrayOf(SpotifyUser::class, SpotifyAlbum::class,
-		SpotifyArtist::class, SpotifyTrack::class), version = 3)
+        SpotifyArtist::class, SpotifyTrack::class), version = 4)
 @TypeConverters(SpotifyConverters::class)
 abstract class ServiceDatabase : RoomDatabase(), SpotifyDatabase {
 	override abstract fun spotifyDao(): SpotifyDao

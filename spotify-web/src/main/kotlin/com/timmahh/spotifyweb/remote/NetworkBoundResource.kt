@@ -24,9 +24,6 @@ import android.support.annotation.WorkerThread
 import com.timmahh.spotifyweb.log
 import com.timmahh.spotifyweb.retrofit.SpotifyCallback
 import com.timmahh.spotifyweb.retrofit.SpotifyError
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Response
 
@@ -75,14 +72,14 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
 	@SuppressLint("WrongThread")
 	@MainThread
 	private fun saveResultAndReInit(response: RequestType) {
-		Observable.just(saveCallResult(response))
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe {
-					asLiveData.addSource(loadFromDb()) { newData ->
-						asLiveData.value = Resource.success(newData)
-					}
-				}
+        /*Observable.just(saveCallResult(response))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    asLiveData.addSource(loadFromDb()) { newData ->
+                        asLiveData.value = Resource.success(newData)
+                    }
+                }*/
 	}
 
     @WorkerThread

@@ -15,11 +15,11 @@ import com.timmahh.spotifyweb.retrofit.models.Token
 @Dao
 interface SpotifyDao {
 	//Token dao methods
-	@Query("SELECT access_token,user_id,token_type,scope,expires_in,refresh_token FROM spotify_users WHERE id=:arg0 OR user_id=:arg0 OR access_token=:arg1")
-	fun loadAuthToken(id: String, authToken: String): Token
-	
 	@Query("SELECT access_token,user_id,token_type,scope,expires_in,refresh_token FROM spotify_users WHERE access_token IS NOT NULL")
-	fun loadInitialAuthUser(): SpotifyUser
+    fun loadAuthToken(): Token
+
+    @Query("SELECT * FROM spotify_users WHERE access_token IS NOT NULL")
+    fun loadInitialAuthUser(): SpotifyUser
 	
 	//User dao methods
 	@Query("SELECT * FROM spotify_users WHERE id=:arg0 OR access_token=:arg1")

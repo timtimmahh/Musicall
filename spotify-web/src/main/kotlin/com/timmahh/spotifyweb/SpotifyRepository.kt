@@ -11,16 +11,16 @@ import com.timmahh.spotifyweb.retrofit.*
 import com.timmahh.spotifyweb.retrofit.models.Token
 import com.timmahh.spotifyweb.retrofit.models.UserPrivate
 import com.timmahh.spotifyweb.room.SpotifyDao
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.debug
 import retrofit2.Call
 import retrofit2.Response
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.concurrent.thread
 
 /**
  * Repository to manage network and database
@@ -37,12 +37,12 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 	
 	fun obtainTokenResource(id: String = "", accessToken: Token = Token(), code: String = "", onCompletion: (MediatorLiveData<Resource<Token>>) -> Unit = {}): AutoResourceObtainer<Token, Token> {
 		return object : AutoResourceObtainer<Token, Token>(onCompletion) {
-			override fun loadResource(value: Token?): Token? {
+            override suspend fun loadResource(value: Token?): Token? {
 				val userId = value?.user_id ?: id
 				val authToken = value ?: accessToken
 				val token: Token? =
 						if (notNullEmpty(userId) || notEmpty(authToken.access_token))
-							serviceDao.loadAuthToken(userId, authToken.access_token)
+                            serviceDao.loadAuthToken()
 						else null
 				updateApiAuthenticator(authToken)
 				log("loadFromDb: ${toString(token)}")
@@ -75,15 +75,15 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 			override fun convertRequestToResultType(item: Token): Token {
 				return item
 			}
-			
-			override fun saveResource(item: Token) {
+
+            override suspend fun saveResource(item: Token) {
 				if (isNull(item)) return
 				item.expires_in = System.currentTimeMillis() + item.expires_in * 1000
 				updateApiAuthenticator(item)
 				TokenLiveData.tInstance.postValue(item)
 			}
-			
-			override fun updateResource(item: Token) {
+
+            override suspend fun updateResource(item: Token) {
 				if (notNull(item))
 					TokenLiveData.tInstance.postValue(item)
 			}
@@ -119,7 +119,7 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 	
 	fun obtainMeResource(id: String = "", accessToken: Token, onCompletion: (MediatorLiveData<Resource<SpotifyUser>>) -> Unit = {}): AutoResourceObtainer<SpotifyUser, UserPrivate> {
 		return object : AutoResourceObtainer<SpotifyUser, UserPrivate>(onCompletion) {
-			override fun loadResource(value: SpotifyUser?): SpotifyUser? {
+            override suspend fun loadResource(value: SpotifyUser?): SpotifyUser? {
 				val userId = value?.id ?: id
 				val authToken = value?.token?.access_token ?: accessToken.access_token
 				val user: SpotifyUser? =
@@ -145,13 +145,13 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 			override fun convertRequestToResultType(item: UserPrivate): SpotifyUser {
 				return SpotifyUser(accessToken, item)
 			}
-			
-			override fun saveResource(item: SpotifyUser) {
+
+            override suspend fun saveResource(item: SpotifyUser) {
 				if (notNull(item))
 					serviceDao.saveMe(item)
 			}
-			
-			override fun updateResource(item: SpotifyUser) {
+
+            override suspend fun updateResource(item: SpotifyUser) {
 				if (notNull(item))
 					serviceDao.updateMe(item)
 			}
@@ -198,7 +198,7 @@ constructor(var serviceDao: SpotifyDao, var spotifyService: SpotifyService, var 
 }
 
 abstract class AutoResourceObtainer<ResultType : Any, RequestType>(val onCompletion:
-                                                                   (MediatorLiveData<Resource<ResultType>>) -> Unit) {
+                                                                   (MediatorLiveData<Resource<ResultType>>) -> Unit) : AnkoLogger {
 	protected val resource: MediatorLiveData<Resource<ResultType>> = MediatorLiveData()
 	val logLevel: Int = Log.DEBUG
 	
@@ -213,9 +213,12 @@ abstract class AutoResourceObtainer<ResultType : Any, RequestType>(val onComplet
 			if (shouldFetchResource(dbResource)) {
 				if (logLevel <= Log.DEBUG) log("fetching new ${resourceData::class.java.simpleName}...")
 				resource.value = Resource.loading(dbResource)
-				Observable.just(fetchResource())
-						.subscribeOn(Schedulers.io())
-						.subscribe()
+                launch(CommonPool) {
+                    fetchResource()
+                }
+                /*Observable.just(fetchResource())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe()*/
 			} else dbResource?.let {
 				resource.value = Resource.success(dbResource); if (logLevel <= Log.DEBUG) log("keeping ${resource::class.java.simpleName} from db")
 			}
@@ -227,31 +230,35 @@ abstract class AutoResourceObtainer<ResultType : Any, RequestType>(val onComplet
 	fun loadResourceFromDb(): MutableLiveData<ResultType> {
 		
 		val dataSource = MutableLiveData<ResultType>()
-		Observable.create<ResultType> { subscriber ->
-			thread {
-				dataSource.postValue(loadResource(null))
-				subscriber.onComplete()
-			}
-		}.observeOn(AndroidSchedulers.mainThread())
-				.subscribe()
+        launch(CommonPool) {
+            dataSource.postValue(loadResource(null))
+        }
+        /*Observable.create<ResultType> { subscriber ->
+            thread {
+                dataSource.postValue(loadResource(null))
+                subscriber.onComplete()
+            }
+        }.observeOn(AndroidSchedulers.mainThread())
+                .subscribe()*/
 		return dataSource
 	}
-	
-	abstract fun loadResource(value: ResultType?): ResultType?
+
+    suspend abstract fun loadResource(value: ResultType?): ResultType?
 	
 	abstract fun shouldFetchResource(value: ResultType?): Boolean
 	
 	private fun fetchResource() {
-		if (logLevel <= Log.DEBUG) log("create network request...")
+        if (logLevel <= Log.DEBUG) debug("create network request...")
 		callMethod().enqueue(object : SpotifyCallback<RequestType>() {
 			override fun onResponse(call: Call<RequestType>, response: Response<RequestType>, payload: RequestType) {
-				saveResultResource(convertRequestToResultType(payload))
+                val resultType = convertRequestToResultType(payload)
+                saveResultResource(resultType)
 			}
 			
 			override fun onFailure(call: Call<RequestType>, error: SpotifyError) {
 				onFetchFailure(call, error)
 				resource.value = Resource.error(error.message, resource.value?.data)
-				if (logLevel <= Log.ERROR) logE("Failed to fetch ${error.message}")
+                if (logLevel <= Log.ERROR) error("Failed to fetch ${error.message}")
 			}
 			
 		})
@@ -260,62 +267,90 @@ abstract class AutoResourceObtainer<ResultType : Any, RequestType>(val onComplet
 	abstract fun callMethod(): Call<RequestType>
 	
 	abstract fun onFetchFailure(call: Call<RequestType>, error: SpotifyError)
-	
-	private fun saveResultResource(item: ResultType) {
-		if (logLevel <= Log.DEBUG) log("saveCallResult: ${toString(item)}")
+
+    private fun saveResultResource(item: ResultType) = launch(CommonPool) {
+        if (logLevel <= Log.DEBUG) debug("saveCallResult: ${toString(item)}")
 		item.let {
-			Observable.create<ResultType> { subscriber ->
-				thread {
-					if (logLevel <= Log.DEBUG) log("saving resource...")
-					saveResource(item)
-					if (logLevel <= Log.DEBUG) {
-						log("resource saved..."); log("reloading resource from db...")
-					}
-					val obj = loadResource(item)
-					if (obj == null) subscriber.onError(NullPointerException("Resource obtained from database is null"))
-					else subscriber.onNext(obj)
-				}
-			}.observeOn(AndroidSchedulers.mainThread())
-					.subscribeBy(onError = {
-						if (logLevel <= Log.DEBUG) {
-							log("error: ${it.message}")
-						}; resource.value = Resource.error(it.message, resource.value?.data)
-					},
-					             onComplete = { if (logLevel <= Log.DEBUG) log("token loaded", "LoadToken"); onCompletion.invoke(resource) }) { resource.value = Resource.success(it) }
+            if (logLevel <= Log.DEBUG) debug("saving resource...")
+            saveResource(item)
+            if (logLevel <= Log.DEBUG) {
+                debug("resource saved...")
+                debug("reloading resource from db...")
+            }
+            val dbResult = loadResource(item)
+            if (dbResult == null) {
+                if (logLevel <= Log.DEBUG) error("Resource obtained from database is null")
+                resource.postValue(Resource.error("Resource obtained from database is " + "null", dbResult))
+            } else resource.postValue(Resource.success(dbResult))
+            if (logLevel <= Log.DEBUG) debug("token loaded")
+            launch(UI) {
+                onCompletion.invoke(resource)
+            }
+            /*Observable.create<ResultType> { subscriber ->
+                thread {
+                    if (logLevel <= Log.DEBUG) log("saving resource...")
+                    saveResource(item)
+                    if (logLevel <= Log.DEBUG) {
+                        log("resource saved..."); log("reloading resource from db...")
+                    }
+                    val obj = loadResource(item)
+                    if (obj == null) subscriber.onError(NullPointerException("Resource obtained from database is null"))
+                    else subscriber.onNext(obj)
+                }
+            }.observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(onError = {
+
+                    },
+                                 onComplete = {  }) {  }*/
 		}
 	}
-	
-	fun updateResultResource(item: ResultType) {
-		if (logLevel <= Log.DEBUG) log("saveCallResult: ${toString(item)}")
+
+    fun updateResultResource(item: ResultType) = launch(CommonPool) {
+        if (logLevel <= Log.DEBUG) debug("saveCallResult: ${toString(item)}")
 		item.let {
-			Observable.create<ResultType> { subscriber ->
-				thread {
-					if (logLevel <= Log.DEBUG) log("updating resource...")
-					updateResource(item)
-					if (logLevel <= Log.DEBUG) {
-						log("resource updated..."); log("reloading resource from db...")
-					}
-					val obj = loadResource(item)
-					if (obj == null) subscriber.onError(NullPointerException("Resource obtained from database is null"))
-					else subscriber.onNext(obj)
-				}
-			}.observeOn(AndroidSchedulers.mainThread())
-					.subscribeBy(onError = {
-						if (logLevel <= Log.DEBUG) {
-							log("error: ${it.message}")
-						}; resource.value = Resource.error(it.message, resource.value?.data)
-					},
-					             onComplete = { if (logLevel <= Log.DEBUG) log("token loaded", "LoadToken"); onCompletion.invoke(resource) }) { resource.value = Resource.success(it) }
+            if (logLevel <= Log.DEBUG) debug("saving resource...")
+            updateResource(item)
+            if (logLevel <= Log.DEBUG) {
+                debug("resource saved...")
+                debug("reloading resource from db...")
+            }
+            val dbResult = loadResource(item)
+            launch(UI) {
+                if (dbResult == null) {
+                    if (logLevel <= Log.DEBUG) {
+                        debug("error: ${"Resource obtained from database is null"}")
+                    }
+                    resource.value = Resource.error("Resource obtained from database is null", resource.value?.data)
+                } else resource.value = Resource.success(it)
+                if (logLevel <= Log.DEBUG) debug("token loaded")
+                onCompletion.invoke(resource)
+            }
+            /*Observable.create<ResultType> { subscriber ->
+                thread {
+                    if (logLevel <= Log.DEBUG) log("updating resource...")
+                    updateResource(item)
+                    if (logLevel <= Log.DEBUG) {
+                        log("resource updated..."); log("reloading resource from db...")
+                    }
+                    val obj = loadResource(item)
+                    if (obj == null) subscriber.onError(NullPointerException("Resource obtained from database is null"))
+                    else subscriber.onNext(obj)
+                }
+            }.observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(onError = {
+
+                    },
+                                 onComplete = {  }) {  }*/
 		}
 	}
 	
 	abstract fun convertRequestToResultType(item: RequestType): ResultType
 	
 	@WorkerThread
-	abstract fun saveResource(item: ResultType)
+    suspend abstract fun saveResource(item: ResultType)
 	
 	@WorkerThread
-	abstract fun updateResource(item: ResultType)
+    suspend abstract fun updateResource(item: ResultType)
 	
 	fun onObtainComplete() {
 		onCompletion.invoke(resource)

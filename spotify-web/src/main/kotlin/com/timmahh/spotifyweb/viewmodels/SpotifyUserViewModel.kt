@@ -12,11 +12,16 @@ import com.timmahh.spotifyweb.livedata.SpotifyUserLiveData
 import com.timmahh.spotifyweb.livedata.TokenLiveData
 import com.timmahh.spotifyweb.remote.Status
 import com.timmahh.spotifyweb.retrofit.models.Token
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Unconfined
+import kotlinx.coroutines.experimental.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * ViewModel implementation to create a Spotify view instance
  */
+@Singleton
 class SpotifyUserViewModel
 @Inject
 constructor(application: Application, private var spotifyRepository: SpotifyRepository) : AndroidViewModel(application) {
@@ -26,15 +31,22 @@ constructor(application: Application, private var spotifyRepository: SpotifyRepo
     }
 
     private fun init() {
+        launch(CommonPool) {
+            spotifyUser.postValue(spotifyRepository.obtainLoggedInUser())
+        }
 	    authToken.addSource(spotifyUser) {
             if (isNull(authToken.value) || isNull(it)) return@addSource
 		    if (it !!.id != authToken.value !!.user_id) {
 			    authToken.value !!.user_id = it.id
-			    spotifyRepository.obtainTokenResource().updateResultResource(authToken.value !!)
+                launch(Unconfined) {
+                    spotifyRepository.obtainTokenResource().updateResultResource(authToken.value!!)
+                }
 		    }
 		    if (it.token.access_token != authToken.value !!.access_token) {
 			    it.token.access_token = authToken.value !!.access_token
-			    spotifyRepository.obtainMeResource(accessToken = authToken.value !!).updateResultResource(it)
+                launch(Unconfined) {
+                    spotifyRepository.obtainMeResource(accessToken = authToken.value!!).updateResultResource(it)
+                }
 		    }
         }
         spotifyUser.addSource(authToken) {
@@ -44,16 +56,19 @@ constructor(application: Application, private var spotifyRepository: SpotifyRepo
 		        }
 		        if (it.user_id != spotifyUser.value !!.id) {
 			        it.user_id = spotifyUser.value !!.id
-			        spotifyRepository.obtainTokenResource().updateResultResource(it)
+                    launch(Unconfined) {
+                        spotifyRepository.obtainTokenResource().updateResultResource(it)
+                    }
 		        }
 		        if (it.access_token != spotifyUser.value !!.token.access_token) {
 			        spotifyUser.value !!.token.access_token = it.access_token
-			        spotifyRepository.obtainMeResource(accessToken = Token())
-					        .updateResultResource(spotifyUser.value !!)
+                    launch(Unconfined) {
+                        spotifyRepository.obtainMeResource(accessToken = Token())
+                                .updateResultResource(spotifyUser.value!!)
+                    }
 		        }
 	        }
         }
-	    spotifyUser.value = spotifyRepository.obtainLoggedInUser()
     }
 	
 	fun loadAuthLogin(contextActivity: Activity, retry: Boolean = false) {
@@ -74,8 +89,10 @@ constructor(application: Application, private var spotifyRepository: SpotifyRepo
 			}
 			AuthenticationResponse.Type.TOKEN -> {
 				log("Token: ${response.accessToken}")
-				spotifyRepository.obtainTokenResource().saveResource(Token(access_token = response.accessToken, scope = arrayOf("playlist-read-private", "playlist-read-collaborative", "playlist-modify-public", "playlist-modify-private", "streaming", "user-follow-modify", "user-follow-read", "user-library-read", "user-library-modify", "user-read-private", "user-read-birthdate", "user-read-email", "user-top-read").toString(),
-						expires_in = response.expiresIn.toLong()))
+                launch(CommonPool) {
+                    spotifyRepository.obtainTokenResource().saveResource(Token(access_token = response.accessToken, scope = arrayOf("playlist-read-private", "playlist-read-collaborative", "playlist-modify-public", "playlist-modify-private", "streaming", "user-follow-modify", "user-follow-read", "user-library-read", "user-library-modify", "user-read-private", "user-read-birthdate", "user-read-email", "user-top-read").toString(),
+                            expires_in = response.expiresIn.toLong()))
+                }
 			}
 			AuthenticationResponse.Type.EMPTY -> {
 				log("LoginActivity stopped before completing")
@@ -90,7 +107,7 @@ constructor(application: Application, private var spotifyRepository: SpotifyRepo
 		}
 		return authToken
 	}
-	
+
 	fun loadAuthToken(id: String = "", accessToken: Token = authToken.value ?: Token(), code: String = ""): TokenLiveData {
         log("loadingToken...")
 	    val tokenResourceObj = spotifyRepository.obtainTokenResource(id, accessToken, code) { authToken.removeSource(it) }
@@ -119,8 +136,9 @@ constructor(application: Application, private var spotifyRepository: SpotifyRepo
         }
         return spotifyUser
     }
-	
-	val authToken: TokenLiveData
+
+
+    val authToken: TokenLiveData
 		get() = TokenLiveData.tInstance
 	
 	val spotifyUser: SpotifyUserLiveData
