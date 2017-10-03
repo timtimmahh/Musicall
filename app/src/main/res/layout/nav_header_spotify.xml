@@ -12,50 +12,53 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/service_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
+        app:layout_constraintBottom_toTopOf="@+id/username"
+        app:layout_constraintStart_toStartOf="@+id/username"
         app:srcCompat="@drawable/spotify_icon_green" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="4dp"
         android:layout_marginStart="4dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:text="Musicall"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintBottom_toTopOf="@+id/user_desc"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Username or service name" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/user_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:text="Ready to play"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton"
+        app:layout_constraintEnd_toStartOf="@+id/nav_drop_button"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
+        app:layout_constraintStart_toStartOf="@+id/username"
         tools:text="User/service description" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/nav_drop_button"
         android:layout_width="wrap_content"
         android:layout_height="34dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:background="@null"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:onClick="serviceDropDown"
         android:paddingHorizontal="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textView"
+        app:layout_constraintBottom_toBottomOf="@+id/user_desc"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="@+id/user_desc"
         app:srcCompat="@android:drawable/arrow_down_float" />
 </android.support.constraint.ConstraintLayout>

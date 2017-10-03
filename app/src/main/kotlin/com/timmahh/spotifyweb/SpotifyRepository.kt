@@ -279,7 +279,7 @@ abstract class AutoResourceObtainer<ResultType : Any, RequestType>(val onComplet
             }
             val dbResult = loadResource(item)
             if (dbResult == null) {
-                if (logLevel <= Log.DEBUG) error("Resource obtained from database is null")
+				if (logLevel <= Log.DEBUG) debug("Resource obtained from database is null")
                 resource.postValue(Resource.error("Resource obtained from database is " + "null", dbResult))
             } else resource.postValue(Resource.success(dbResult))
             if (logLevel <= Log.DEBUG) debug("token loaded")
