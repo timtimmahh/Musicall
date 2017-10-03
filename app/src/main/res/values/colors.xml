@@ -3,4 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="spotifyBlack">#191414</color>
+    <color name="spotifyGreen">#1db954</color>
+    <color name="spotifyWhite">@android:color/white</color>
 </resources>

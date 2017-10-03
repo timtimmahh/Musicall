@@ -8,6 +8,33 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="SpotifyAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/spotifyGreen</item>
+        <item name="colorPrimaryDark">@color/spotifyBlack</item>
+        <item name="colorAccent">@color/spotifyGreen</item>
+        <item name="android:colorBackground">@color/spotifyWhite</item>
+        <item name="android:colorForeground">@color/spotifyBlack</item>
+        <item name="android:textColorPrimary">@color/spotifyBlack</item>
+        <item name="android:textColorPrimaryInverse">@color/spotifyBlack</item>
+        <item name="android:textColorSecondary">@color/spotifyBlack</item>
+        <item name="android:textColorSecondaryInverse">@color/spotifyBlack</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+    </style>
+
+    <style name="SpotifyAppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/spotifyGreen</item>
+        <item name="colorPrimaryDark">@color/spotifyWhite</item>
+        <item name="colorAccent">@color/spotifyGreen</item>
+        <item name="android:colorBackground">@color/spotifyBlack</item>
+        <item name="android:colorForeground">@color/spotifyWhite</item>
+        <item name="android:textColorPrimary">@color/spotifyWhite</item>
+        <item name="android:textColorPrimaryInverse">@color/spotifyWhite</item>
+        <item name="android:textColorSecondary">@color/spotifyWhite</item>
+        <item name="android:textColorSecondaryInverse">@color/spotifyWhite</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
